@@ -1,0 +1,111 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const guides = (await getCollection("guides")).sort(
+  (a, b) => b.data.updated.getTime() - a.data.updated.getTime()
+);
+const categories = ["All", ...new Set(guides.map((guide) => guide.data.category))];
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="GuGuData.io Guides | Practical API Integration Guides"
+  description="Implementation notes, examples, and integration patterns for GuGuData.io APIs."
+>
+  <section class="guide-index container">
+    <div class="index-intro">
+      <h1>Practical API guides for developers</h1>
+      <p>Implementation notes, examples, and integration patterns for GuGuData.io APIs.</p>
+    </div>
+
+    <div class="search-wrap">
+      <label class="sr-only" for="guide-search">Search guides</label>
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m16.2 16.2 4 4"></path>
+      </svg>
+      <input id="guide-search" type="search" placeholder="Search guides…" autocomplete="off" />
+    </div>
+
+    <div class="category-tabs" role="tablist" aria-label="Guide categories">
+      {categories.map((category, index) => (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={index === 0 ? "true" : "false"}
+          data-category={category}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+
+    <div class="guide-table" aria-live="polite">
+      <div class="guide-head" aria-hidden="true">
+        <span>Guide</span>
+        <span>Category</span>
+        <span>Updated</span>
+      </div>
+      <div id="guide-list">
+        {guides.map((guide) => (
+          <article
+            class="guide-row"
+            data-title={`${guide.data.title} ${guide.data.description}`.toLowerCase()}
+            data-category={guide.data.category}
+          >
+            <a class="guide-link" href={`${base}guides/${guide.data.slug}/`} aria-label={`Read ${guide.data.title}`}>
+              <span class="guide-mark" aria-hidden="true"></span>
+              <span class="guide-copy">
+                <strong>{guide.data.title}</strong>
+                <span>{guide.data.description}</span>
+              </span>
+              <span class="guide-category">{guide.data.category}</span>
+              <time datetime={guide.data.updated.toISOString()}>
+                {guide.data.updated.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric"
+                })}
+              </time>
+              <span class="row-arrow" aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+      <p class="empty-state" id="empty-state" hidden>No guides match this search.</p>
+    </div>
+  </section>
+
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>("#guide-search");
+    const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-category]"));
+    const rows = Array.from(document.querySelectorAll<HTMLElement>(".guide-row"));
+    const emptyState = document.querySelector<HTMLElement>("#empty-state");
+    let activeCategory = "All";
+
+    function filterGuides() {
+      const query = searchInput?.value.trim().toLowerCase() ?? "";
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const matchesQuery = row.dataset.title?.includes(query) ?? false;
+        const matchesCategory = activeCategory === "All" || row.dataset.category === activeCategory;
+        const isVisible = matchesQuery && matchesCategory;
+        row.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      if (emptyState) emptyState.hidden = visibleCount > 0;
+    }
+
+    searchInput?.addEventListener("input", filterGuides);
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        activeCategory = tab.dataset.category ?? "All";
+        tabs.forEach((item) => item.setAttribute("aria-selected", String(item === tab)));
+        filterGuides();
+      });
+    });
+  </script>
+</BaseLayout>

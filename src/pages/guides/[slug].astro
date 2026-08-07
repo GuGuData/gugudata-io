@@ -1,0 +1,77 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const guides = await getCollection("guides");
+  return guides.map((guide) => ({ params: { slug: guide.data.slug }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const { Content, headings } = await render(guide);
+const toc = headings.filter((heading) => heading.depth === 2);
+const base = import.meta.env.BASE_URL;
+const readingMinutes = Math.max(3, Math.ceil(guide.body.split(/\s+/).length / 220));
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  headline: guide.data.title,
+  description: guide.data.description,
+  datePublished: guide.data.date.toISOString(),
+  dateModified: guide.data.updated.toISOString(),
+  inLanguage: "en",
+  author: { "@type": "Organization", name: "GuGuData.io" },
+  publisher: { "@type": "Organization", name: "GuGuData.io" },
+  mainEntityOfPage: new URL(`${base}guides/${guide.data.slug}/`, Astro.site).toString()
+};
+---
+
+<BaseLayout
+  title={`${guide.data.title} | GuGuData.io Guides`}
+  description={guide.data.description}
+  type="article"
+  publishedTime={guide.data.date}
+  modifiedTime={guide.data.updated}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <div class="article-shell container">
+    <article class="article">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={base}>Guides</a><span aria-hidden="true">/</span><span>{guide.data.category}</span>
+      </nav>
+      <header class="article-header">
+        <h1>{guide.data.title}</h1>
+        <p class="standfirst">{guide.data.description}</p>
+        <div class="article-meta">
+          <time datetime={guide.data.updated.toISOString()}>
+            Updated {guide.data.updated.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            })}
+          </time>
+          <span aria-hidden="true">·</span>
+          <span>{readingMinutes} min read</span>
+        </div>
+        {(guide.data.demoUrl || guide.data.detailUrl) && (
+          <div class="article-actions">
+            {guide.data.demoUrl && <a class="button primary" href={guide.data.demoUrl}>Try the live demo</a>}
+            {guide.data.detailUrl && <a class="button text" href={guide.data.detailUrl}>View API details →</a>}
+          </div>
+        )}
+      </header>
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+
+    {toc.length > 0 && (
+      <aside class="toc" aria-label="On this page">
+        <strong>On this page</strong>
+        <nav>
+          {toc.map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}
+        </nav>
+      </aside>
+    )}
+  </div>
+</BaseLayout>

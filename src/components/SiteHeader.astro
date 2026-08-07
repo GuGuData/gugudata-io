@@ -1,0 +1,18 @@
+---
+const { active = "guides" } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href={base} aria-label="GuGuData.io Guides home">
+      <span>GuGuData.io</span> Guides
+    </a>
+    <nav aria-label="Primary navigation">
+      <a class:list={{ active: active === "guides" }} href={base}>Guides</a>
+      <a href="https://gugudata.io/list/">API Marketplace</a>
+      <a href="https://developers.gugudata.io/">Developer Docs</a>
+      <a href="https://github.com/GuGuData/gugudata-io">GitHub</a>
+    </nav>
+  </div>
+</header>

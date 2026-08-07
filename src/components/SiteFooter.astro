@@ -1,0 +1,15 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>© {new Date().getFullYear()} GuGuData.io</p>
+    <nav aria-label="Footer navigation">
+      <a href="https://gugudata.io/">GuGuData.io</a>
+      <a href="https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json">OpenAPI</a>
+      <a href="https://www.postman.com/gugudata">Postman</a>
+      <a href={`${base}rss.xml`}>RSS</a>
+    </nav>
+  </div>
+</footer>

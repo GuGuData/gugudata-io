@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gugudata.github.io/gugudata-io/sitemap-index.xml
