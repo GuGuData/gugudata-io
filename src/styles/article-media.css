@@ -1,0 +1,40 @@
+.prose img,
+.prose svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 28px auto;
+  border: 1px solid #e7eaf3;
+  border-radius: 16px;
+  background: #f7faff;
+}
+
+.prose img[alt*="data flow" i],
+.prose img[src*="/diagrams/"] {
+  padding: 0;
+  box-shadow: 0 16px 42px rgba(20, 36, 84, 0.08);
+}
+
+.prose figure {
+  margin: 32px 0;
+}
+
+.prose figure img,
+.prose figure svg {
+  margin-bottom: 10px;
+}
+
+.prose figcaption {
+  color: #677788;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .prose img,
+  .prose svg {
+    margin-block: 22px;
+    border-radius: 12px;
+  }
+}

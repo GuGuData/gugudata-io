@@ -1,0 +1,97 @@
+<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="rag-ingestion-title rag-ingestion-desc">
+    <title id="rag-ingestion-title">RAG document ingestion pipeline</title>
+    <desc id="rag-ingestion-desc">Images and PDFs move through extraction, normalization, traceable chunks, a knowledge base, and retrieval with sources. Failed extraction is sent to a review queue.</desc>
+    <defs>
+      <pattern id="rag-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+        <circle cx="12" cy="12" r="1" fill="#142454" opacity="0.08"/>
+      </pattern>
+      <marker id="rag-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#677788"/>
+      </marker>
+      <marker id="rag-arrow-accent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M0 0 L10 5 L0 10 Z" fill="#377dff"/>
+      </marker>
+      <style>
+        .eyebrow { fill: #677788; font: 600 14px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 2.8px; }
+        .heading { fill: #1e2022; font: 400 42px "Instrument Serif", Georgia, serif; }
+        .subheading { fill: #677788; font: 400 17px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .step { fill: #8c98a4; font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1.6px; text-anchor: middle; }
+        .node-title { fill: #1e2022; font: 650 17px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-anchor: middle; }
+        .node-copy { fill: #677788; font: 400 13px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .node-copy-accent { fill: #142454; font: 500 13px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .flow-label { fill: #677788; font: 500 12px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .flow-label-accent { fill: #377dff; font: 650 12px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .legend { fill: #677788; font: 400 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      </style>
+    </defs>
+
+    <rect width="1280" height="720" fill="#f7faff"/>
+    <rect width="1280" height="720" fill="url(#rag-dots)"/>
+    <text x="56" y="64" class="eyebrow">DATA FLOW · ENGINEERING VIEW</text>
+    <text x="56" y="116" class="heading">From unstructured input to a traceable RAG artifact</text>
+    <text x="56" y="150" class="subheading">Extraction is one stage. Reliable retrieval also needs validation, provenance, permissions, and explicit failure states.</text>
+
+    <rect x="56" y="212" width="1168" height="240" rx="16" fill="#f8fafd" stroke="#e7eaf3" stroke-width="2"/>
+    <line x1="56" y1="252" x2="1224" y2="252" stroke="#e7eaf3" stroke-width="2"/>
+
+    <text x="136" y="238" class="step">01 · INPUT</text>
+    <text x="336" y="238" class="step">02 · EXTRACT</text>
+    <text x="536" y="238" class="step">03 · NORMALIZE</text>
+    <text x="736" y="238" class="step">04 · STRUCTURE</text>
+    <text x="936" y="238" class="step">05 · INDEX</text>
+    <text x="1136" y="238" class="step">06 · RETRIEVE</text>
+
+    <!-- Connectors are rendered before nodes so arrowheads remain behind cards. -->
+    <path class="connector" d="M216 332 H256" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#rag-arrow)"/>
+    <path class="connector" d="M416 332 H456" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#rag-arrow)"/>
+    <path class="connector" d="M616 332 H656" fill="none" stroke="#377dff" stroke-width="4" marker-end="url(#rag-arrow-accent)"/>
+    <path class="connector" d="M816 332 H856" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#rag-arrow)"/>
+    <path class="connector" d="M1016 332 H1056" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#rag-arrow)"/>
+    <path class="connector" d="M536 392 V492" fill="none" stroke="#677788" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#rag-arrow)"/>
+
+    <rect x="482" y="430" width="108" height="20" rx="4" fill="#f7faff"/>
+    <text x="536" y="445" class="flow-label">EMPTY / LOW QUALITY</text>
+
+    <rect class="node" x="56" y="272" width="160" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="136" y="318" class="node-title">Images + PDFs</text>
+    <text x="136" y="346" class="node-copy">scan · report · form</text>
+    <text x="136" y="370" class="node-copy">source hash</text>
+
+    <rect class="node" x="256" y="272" width="160" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="336" y="312" class="node-title">OCR / PDF Text</text>
+    <text x="336" y="340" class="node-copy">multipart upload</text>
+    <text x="336" y="364" class="node-copy">raw extraction</text>
+
+    <rect class="node" x="456" y="272" width="160" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="536" y="312" class="node-title">Normalize</text>
+    <text x="536" y="340" class="node-copy">pages · headings</text>
+    <text x="536" y="364" class="node-copy">validate quality</text>
+
+    <rect class="node" x="656" y="272" width="160" height="120" rx="12" fill="#eef4ff" stroke="#377dff" stroke-width="3"/>
+    <text x="736" y="312" class="node-title">Traceable Chunks</text>
+    <text x="736" y="340" class="node-copy-accent">page · heading</text>
+    <text x="736" y="364" class="node-copy-accent">permission scope</text>
+
+    <rect class="node" x="856" y="272" width="160" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="936" y="312" class="node-title">Knowledge Base</text>
+    <text x="936" y="340" class="node-copy">approved artifacts</text>
+    <text x="936" y="364" class="node-copy">searchable index</text>
+
+    <rect class="node" x="1056" y="272" width="160" height="120" rx="12" fill="#f7faff" stroke="#142454" stroke-width="2"/>
+    <text x="1136" y="312" class="node-title">Cited Answers</text>
+    <text x="1136" y="340" class="node-copy">retrieved evidence</text>
+    <text x="1136" y="364" class="node-copy">cited response</text>
+
+    <rect class="node" x="456" y="492" width="160" height="88" rx="12" fill="#f8fafd" stroke="#677788" stroke-width="2" stroke-dasharray="8 8"/>
+    <text x="536" y="528" class="node-title">Review Queue</text>
+    <text x="536" y="554" class="node-copy">retry or replace</text>
+
+    <line x1="56" y1="632" x2="1224" y2="632" stroke="#e7eaf3" stroke-width="2"/>
+    <line x1="64" y1="670" x2="112" y2="670" stroke="#677788" stroke-width="3" marker-end="url(#rag-arrow)"/>
+    <text x="128" y="675" class="legend">Standard handoff</text>
+    <line x1="296" y1="670" x2="344" y2="670" stroke="#377dff" stroke-width="4" marker-end="url(#rag-arrow-accent)"/>
+    <text x="360" y="675" class="legend">Validated structured artifact</text>
+    <line x1="600" y1="670" x2="648" y2="670" stroke="#677788" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#rag-arrow)"/>
+    <text x="664" y="675" class="legend">Missing or failed state</text>
+    <text x="1224" y="675" class="legend" text-anchor="end">GuGuData.io · 2026-08-20</text>
+  </svg>
