@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical SEO audit process</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7faff; }
+    svg { display: block; width: min(100%, 1280px); height: auto; }
+  </style>
+</head>
+<body>
+  <svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="seo-audit-title seo-audit-desc">
+    <title id="seo-audit-title">Technical SEO audit process</title>
+    <desc id="seo-audit-desc">Content, performance, and domain signals are sampled independently, normalized against prior evidence, and converted into a prioritized technical SEO report.</desc>
+    <defs>
+      <pattern id="seo-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="1" fill="#142454" opacity="0.08"/></pattern>
+      <marker id="seo-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#677788"/></marker>
+      <marker id="seo-arrow-accent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#377dff"/></marker>
+      <style>
+        .eyebrow { fill: #677788; font: 600 14px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 2.8px; }
+        .heading { fill: #1e2022; font: 400 42px "Instrument Serif", Georgia, serif; }
+        .subheading { fill: #677788; font: 400 17px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .lane { fill: #8c98a4; font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1.5px; text-anchor: middle; }
+        .node-title { fill: #1e2022; font: 650 18px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-anchor: middle; }
+        .node-copy { fill: #677788; font: 400 13px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .node-copy-accent { fill: #142454; font: 500 13px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+        .legend { fill: #677788; font: 400 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      </style>
+    </defs>
+    <rect width="1280" height="720" fill="#f7faff"/>
+    <rect width="1280" height="720" fill="url(#seo-dots)"/>
+    <text x="56" y="64" class="eyebrow">PROCESS · TECHNICAL SEO</text>
+    <text x="56" y="116" class="heading">Independent signals become an actionable audit</text>
+    <text x="56" y="150" class="subheading">Sample by scope, retain raw evidence, compare a consistent baseline, and keep unavailable checks visible.</text>
+
+    <rect x="56" y="212" width="1168" height="320" rx="16" fill="#f8fafd" stroke="#e7eaf3" stroke-width="2"/>
+    <line x1="56" y1="252" x2="1224" y2="252" stroke="#e7eaf3" stroke-width="2"/>
+    <text x="156" y="238" class="lane">CONTENT SIGNAL</text>
+    <text x="396" y="238" class="lane">PERFORMANCE SIGNAL</text>
+    <text x="636" y="238" class="lane">DOMAIN SIGNALS</text>
+    <text x="904" y="238" class="lane">NORMALIZE + COMPARE</text>
+    <text x="1136" y="238" class="lane">REPORT</text>
+
+    <!-- Independent observations converge through orthogonal paths. -->
+    <path class="connector" d="M156 392 V400 H816" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#seo-arrow)"/>
+    <path class="connector" d="M396 392 V420 H816" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#seo-arrow)"/>
+    <path class="connector" d="M636 392 V440 H816" fill="none" stroke="#677788" stroke-width="3" marker-end="url(#seo-arrow)"/>
+    <path class="connector" d="M992 380 H1048" fill="none" stroke="#377dff" stroke-width="4" marker-end="url(#seo-arrow-accent)"/>
+
+    <rect class="node" x="56" y="272" width="200" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="156" y="314" class="node-title">Readable Content</text>
+    <text x="156" y="342" class="node-copy">title · headings · body</text>
+    <text x="156" y="366" class="node-copy">URL-level sample</text>
+
+    <rect class="node" x="296" y="272" width="200" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="396" y="314" class="node-title">PageSpeed</text>
+    <text x="396" y="342" class="node-copy">strategy · categories</text>
+    <text x="396" y="366" class="node-copy">URL-level sample</text>
+
+    <rect class="node" x="536" y="272" width="200" height="120" rx="12" fill="#f7faff" stroke="#cfd6e4" stroke-width="2"/>
+    <text x="636" y="314" class="node-title">DNS · SSL · WHOIS</text>
+    <text x="636" y="342" class="node-copy">resolution · certificate</text>
+    <text x="636" y="366" class="node-copy">domain-level sample</text>
+
+    <rect class="node" x="816" y="300" width="176" height="160" rx="12" fill="#eef4ff" stroke="#377dff" stroke-width="3"/>
+    <text x="904" y="338" class="node-title">Findings</text>
+    <text x="904" y="368" class="node-copy-accent">retain raw evidence</text>
+    <text x="904" y="394" class="node-copy-accent">compare prior run</text>
+    <text x="904" y="420" class="node-copy-accent">mark data gaps</text>
+
+    <rect class="node" x="1048" y="320" width="176" height="120" rx="12" fill="#f7faff" stroke="#142454" stroke-width="2"/>
+    <text x="1136" y="362" class="node-title">Priority Report</text>
+    <text x="1136" y="390" class="node-copy">impact · owner</text>
+    <text x="1136" y="414" class="node-copy">new · recurring</text>
+
+    <line x1="56" y1="632" x2="1224" y2="632" stroke="#e7eaf3" stroke-width="2"/>
+    <line x1="64" y1="670" x2="112" y2="670" stroke="#677788" stroke-width="3" marker-end="url(#seo-arrow)"/>
+    <text x="128" y="675" class="legend">Independent observation</text>
+    <line x1="336" y1="670" x2="384" y2="670" stroke="#377dff" stroke-width="4" marker-end="url(#seo-arrow-accent)"/>
+    <text x="400" y="675" class="legend">Prioritized output</text>
+    <text x="1224" y="675" class="legend" text-anchor="end">GuGuData.io · 2026-08-20</text>
+  </svg>
+</body>
+</html>
