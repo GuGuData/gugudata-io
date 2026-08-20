@@ -5,7 +5,14 @@ export default defineConfig({
   site: "https://gugudata.github.io",
   base: "/gugudata-io",
   trailingSlash: "always",
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return pathname === "/gugudata-io/" || pathname.startsWith("/gugudata-io/guides/");
+      }
+    })
+  ],
   markdown: {
     shikiConfig: {
       theme: "github-dark-default",

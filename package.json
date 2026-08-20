@@ -8,11 +8,12 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run content:audit && astro build",
+    "build": "npm run content:audit && astro build && npm run links:check",
     "preview": "astro preview",
     "content:sync": "node scripts/sync-content.mjs",
     "content:audit": "node scripts/audit-content.mjs",
-    "test:content": "node --test scripts/content-pipeline.test.mjs"
+    "test:content": "node --test scripts/content-pipeline.test.mjs",
+    "links:check": "node scripts/check-internal-links.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.3",
