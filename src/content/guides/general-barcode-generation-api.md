@@ -5,7 +5,7 @@ description: >-
   request parameters, response fields, error handling, and practical examples.
 slug: general-barcode-generation-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-24'
 category: Codes & Barcodes
 apiName: General Barcode Generation
 apiMethod: POST
@@ -55,10 +55,18 @@ This endpoint accepts parameters through the query string plus request body. Kee
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `type` | `string` | Yes | - | Endpoint-specific type selector. Refer to the endpoint description for supported values. |
-| `content` | `string` | Yes | - | Primary text content processed by the endpoint. |
-| `width` | `integer` | Yes | - | Output width in pixels. |
-| `height` | `integer` | Yes | - | Output height in pixels. |
+| `type` | `string` | Yes | `CODE128` | One-dimensional barcode symbology. Supported values are listed below. |
+| `content` | `string` | Yes | - | Content to encode, up to 512 characters. Format rules depend on the selected symbology. |
+| `width` | `integer` | Yes | `290` | Output width in pixels, from 64 to 2048. The historical value `1` uses the default width. |
+| `height` | `integer` | Yes | `120` | Output height in pixels, from 32 to 2048. The historical value `1` uses the default height. |
+
+### Supported barcode types
+
+The API supports the following 40 one-dimensional barcode types:
+
+`UPCA`, `UPCE`, `UPCSupplemental2Digit`, `UPCSupplemental5Digit`, `EAN13`, `EAN8`, `Interleaved2Of5`, `Interleaved2Of5Mod10`, `Standard2Of5`, `Standard2Of5Mod10`, `Industrial2Of5`, `Industrial2Of5Mod10`, `Code39`, `Code39Extended`, `Code39Mod43`, `Codabar`, `PostNet`, `Bookland`, `ISBN`, `JAN13`, `MsiMod10`, `Msi2Mod10`, `MsiMod11`, `MsiMod11Mod10`, `ModifiedPlessey`, `Code11`, `Usd8`, `Code32`, `Ucc12`, `Ucc13`, `Logmars`, `Code128`, `Code128A`, `Code128B`, `Code128C`, `Itf14`, `Code93`, `Telepen`, `Fim`, and `Pharmacode`.
+
+Choose a type that matches the content format required by the scanner or downstream workflow. For general alphanumeric content, `CODE128` is a practical default.
 
 ## Example request
 
@@ -69,31 +77,35 @@ curl -X POST "https://api.gugudata.io/v1/barcode?appkey=YOUR_APPKEY" \
 {
   "type": "CODE128",
   "content": "123456789012",
-  "width": 1,
-  "height": 1
+  "width": 290,
+  "height": 120
 }
 '
 ```
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+The response body contains the fields below for successful requests.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `url` | `string` | Yes | CDN URL of the generated barcode image. Validation failures may return a plain-text error message instead of the success payload. |
+| `url` | `string` | Yes | CDN URL of the generated PNG barcode image. |
 
 ## Response example
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "type=CODE128&content_length=12&width=290&height=120",
     "statusCode": 200,
+    "status": "SUCCESS",
     "statusDescription": "successfully",
     "responseDateTime": "2026-04-10T00:00:00Z",
     "dataTotalCount": 1
   },
-  "data": "sample value"
+  "data": {
+    "url": "https://storage.gugudata.io/barcode/example.png"
+  }
 }
 ```
 
@@ -115,7 +127,7 @@ Use the HTTP status code for transport-level handling. If the response body cont
 
 - Validate required parameters before sending the request so `400` responses are easier to diagnose.
 - Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
+- Verify that the selected barcode type matches the content format expected by downstream scanners.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
 - Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
 
