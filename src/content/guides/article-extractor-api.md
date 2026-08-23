@@ -5,7 +5,7 @@ description: >-
   parameters, response fields, error handling, and practical examples.
 slug: article-extractor-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-23'
 category: Website Tools
 apiName: Article Extractor
 apiMethod: POST
@@ -23,7 +23,7 @@ featured: false
 
 # Article Extractor API Integration Guide
 
-The Article Extractor API from GuGuData helps developers extract the primary article content, title, byline, publication date, and clean body text from a target webpage or raw HTML input.
+The Article Extractor API from GuGuData helps developers extract the primary article content, title, byline, publication date, and clean body text from a target webpage URL or a raw HTML document.
 
 
 
@@ -37,6 +37,7 @@ The Article Extractor API from GuGuData helps developers extract the primary art
 | Category | Website Tools APIs |
 | Method | `POST` |
 | Endpoint | `https://api.gugudata.io/v1/article/extract` |
+| Raw HTML endpoint | `https://api.gugudata.io/v1/article/extractFromHtml` |
 | Content type | `application/json` |
 | Demo endpoint | [https://api.gugudata.io/v1/article/extract/demo](https://api.gugudata.io/v1/article/extract/demo) |
 | Detail page | [https://gugudata.io/details/article-extract](https://gugudata.io/details/article-extract) |
@@ -50,12 +51,27 @@ The Article Extractor API from GuGuData helps developers extract the primary art
 
 ## Request parameters
 
-This endpoint accepts parameters through the query string plus request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+Both operations accept `appkey` in the query string and a JSON request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+
+### Extract from a public URL
 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
 | `url` | `string` | Yes | - | Target webpage URL. |
+| `parserOptions` | `object` | No | - | Optional reading-speed and content-threshold settings. |
+| `fetchOptions` | `object` | No | - | Optional timeout and safe request headers used while fetching the public page. |
+
+`fetchOptions.timeoutMs` accepts values from 1,000 to 30,000 milliseconds. Forwarded headers are restricted to `user-agent`, `accept`, and `accept-language`, with a maximum value length of 512 characters.
+
+### Extract from raw HTML
+
+| Parameter | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. |
+| `html` | `string` | Yes | - | Raw HTML document, limited to 10 MiB when encoded as UTF-8. |
+| `url` | `string` | No | - | Optional public source URL used to resolve relative links and identify the source. |
+| `parserOptions` | `object` | No | - | Optional reading-speed and content-threshold settings. |
 
 ## Example request
 
@@ -64,6 +80,19 @@ curl -X POST "https://api.gugudata.io/v1/article/extract?appkey=YOUR_APPKEY" \
   -H "Content-Type: application/json" \
   -d '
 {
+  "url": "https://example.com/article"
+}
+'
+```
+
+To extract from HTML without fetching a page:
+
+```bash
+curl -X POST "https://api.gugudata.io/v1/article/extractFromHtml?appkey=YOUR_APPKEY" \
+  -H "Content-Type: application/json" \
+  -d '
+{
+  "html": "<article><h1>Example article</h1><p>Readable content.</p></article>",
   "url": "https://example.com/article"
 }
 '
@@ -102,7 +131,20 @@ The response body contains the fields below for successful JSON responses. For b
     "responseDateTime": "2026-04-10T00:00:00Z",
     "dataTotalCount": 1
   },
-  "data": "sample value"
+  "data": {
+    "url": "https://example.com/article",
+    "title": "Example article",
+    "description": "A short article summary.",
+    "links": ["https://example.com/related"],
+    "image": "https://example.com/cover.jpg",
+    "content": "<article><h1>Example article</h1><p>Readable content.</p></article>",
+    "author": "Example Author",
+    "favicon": "https://example.com/favicon.ico",
+    "source": "example.com",
+    "published": "2026-08-23 10:00",
+    "ttr": 1,
+    "type": "article"
+  }
 }
 ```
 
@@ -116,6 +158,7 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
 | `401` | Missing or unknown application key. | Send a valid appkey with the request. |
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
+| `422` | The target does not contain extractable article content. | Confirm the URL or HTML contains a readable article body. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
 | `500` | Internal service error. | Retry later or contact support if the error persists. |
 | `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
@@ -123,6 +166,8 @@ Use the HTTP status code for transport-level handling. If the response body cont
 ## Implementation notes
 
 - Validate required parameters before sending the request so `400` responses are easier to diagnose.
+- Accept only public HTTP or HTTPS source URLs. Private, loopback, file, and credential-bearing targets are rejected.
+- Use `extractFromHtml` when your application already has the page HTML and does not need GuGuData to fetch the source URL.
 - Keep server-side retries conservative for `429`, `500`, and `503` responses.
 - Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
