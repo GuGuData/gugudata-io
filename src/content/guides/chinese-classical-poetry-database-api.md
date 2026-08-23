@@ -6,7 +6,7 @@ description: >-
   examples.
 slug: chinese-classical-poetry-database-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-24'
 category: Data
 apiName: Chinese Classical Poetry Database
 apiMethod: GET
@@ -56,21 +56,21 @@ This endpoint accepts parameters through the query string. Keep `appkey` out of 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `keywords` | `string` | No | - | Keyword used for fuzzy matching against the searchable text fields supported by this endpoint. |
-| `pagesize` | `integer` | No | `10` | Number of records returned per page. |
-| `pagenumber` | `integer` | No | `1` | One-based page number for pagination. |
-| `type` | `string` | No | - | Poetry type filter. Accepted values are `唐诗`, `宋诗`, and `宋词`. |
-| `searchtype` | `string` | No | `all` | Search scope accepted by the API contract. The demo uses `all`. |
+| `keywords` | `string` | No | - | Literal keyword, up to 100 characters. Simplified Chinese also matches traditional Chinese poem content. |
+| `pagesize` | `integer` | No | `10` | Number of records returned per page, from 1 to 20. |
+| `pagenumber` | `integer` | No | `1` | One-based page number, starting at 1. |
+| `type` | `string` | No | - | Canonical values are `tang`, `song`, and `ci`; `唐诗`, `宋诗`, and `宋词` are accepted aliases. |
+| `searchtype` | `string` | No | `all` | Search scope: `all`, `author`, `title`, or `content`. |
 
 ## Example request
 
 ```bash
 curl -G "https://api.gugudata.io/v1/text/chinese-poem" \
   --data-urlencode "appkey=YOUR_APPKEY" \
-  --data-urlencode "keywords=Li Bai" \
+  --data-urlencode "keywords=李白" \
   --data-urlencode "pagesize=10" \
   --data-urlencode "pagenumber=1" \
-  --data-urlencode "type=%E5%94%90%E8%AF%97" \
+  --data-urlencode "type=tang" \
   --data-urlencode "searchtype=all"
 ```
 
@@ -86,7 +86,7 @@ The response body contains the fields below for successful JSON responses. For b
 | `dataStatus.statusDescription` | `string` | Yes | Response body status message. Successful demo responses currently return a Chinese message. |
 | `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
 | `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `data` | `array<string>` | Yes | Primary response payload returned by the endpoint. |
+| `data` | `array<object>` | Yes | Matching poetry records for the requested page. |
 | `data[].title` | `string` | Yes | Title of the poem or lyric |
 | `data[].author` | `string` | Yes | Author name |
 | `data[].content` | `array<string>` | Yes | Array of strings containing the poem/lyric content, each element is one line |
@@ -99,11 +99,21 @@ The response body contains the fields below for successful JSON responses. For b
   "dataStatus": {
     "statusCode": 100,
     "statusDescription": "请求成功。",
-    "responseDateTime": "2026-04-10T00:00:00Z",
-    "dataTotalCount": 1,
-    "requestParameter": ""
+    "responseDateTime": "2026-08-24 10:00:00.000",
+    "dataTotalCount": 244,
+    "requestParameter": "keywords=烽火&pagesize=10&pagenumber=1&type=&searchtype=all"
   },
-  "data": "sample value"
+  "data": [
+    {
+      "title": "贺新凉・贺新郎",
+      "author": "吴泳",
+      "content": [
+        "额扣龙墀苦。",
+        "对南宫、春风侍女，掉头不顾。"
+      ],
+      "type": "宋词"
+    }
+  ]
 }
 ```
 
@@ -119,7 +129,7 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
 | `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `503` | Poetry data is temporarily unavailable. | Retry later and contact support if the condition persists. |
 
 ## Implementation notes
 
@@ -128,6 +138,7 @@ Use the HTTP status code for transport-level handling. If the response body cont
 - Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
 - Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+- Treat `keywords` as text. Regular-expression syntax is matched literally.
 
 ## FAQ
 
