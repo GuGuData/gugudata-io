@@ -5,7 +5,7 @@ description: >-
   request parameters, response fields, error handling, and practical examples.
 slug: ip-address-geolocation-lookup-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-24'
 category: Website Tools
 apiName: IP Address Geolocation Lookup
 apiMethod: GET
@@ -24,6 +24,8 @@ featured: false
 # IP Address Geolocation Lookup API Integration Guide
 
 The IP Address Geolocation Lookup API from GuGuData helps developers look up geolocation metadata for an IPv4 or IPv6 address.
+
+Location data is based on the monthly DB-IP City Lite dataset and is approximate. [IP geolocation data by DB-IP](https://db-ip.com/).
 
 
 
@@ -126,6 +128,7 @@ Use the HTTP status code for transport-level handling. If the response body cont
 - Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
 - Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+- Treat city and coordinate results as approximate network-location signals rather than precise device locations.
 
 ## FAQ
 
