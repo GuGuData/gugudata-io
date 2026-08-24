@@ -6,7 +6,7 @@ description: >-
   examples.
 slug: geographic-coordinate-system-converter-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-24'
 category: Website Tools
 apiName: Geographic Coordinate System Converter
 apiMethod: GET
@@ -24,7 +24,7 @@ featured: false
 
 # Geographic Coordinate System Converter API Integration Guide
 
-The Geographic Coordinate System Converter API from GuGuData helps developers convert geographic coordinates between WGS84, GCJ02, and BD09 between WGS84, GCJ02, and BD09.
+The Geographic Coordinate System Converter API from GuGuData converts longitude and latitude pairs between WGS84, GCJ02, and BD09 for map display, location normalization, and geospatial data workflows.
 
 
 
@@ -56,9 +56,11 @@ This endpoint accepts parameters through the query string. Keep `appkey` out of 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `from` | `string` | Yes | - | Source coordinate system. Supported values are `WGS84`, `GCJ02`, and `BD09`. |
-| `to` | `string` | Yes | - | Target coordinate system. Supported values are `WGS84`, `GCJ02`, and `BD09`. |
+| `from` | `string` | Yes | - | Source coordinate system: `WGS84`, `GCJ02`, or `BD09`. |
+| `to` | `string` | Yes | - | Target coordinate system: `WGS84`, `GCJ02`, or `BD09`. |
 | `value` | `string` | Yes | - | Coordinate pair in `[longitude,latitude]` format, for example `[120.54,32.74]`. |
+
+Use the documented uppercase coordinate-system names in new integrations. The API normalizes surrounding whitespace and letter case for compatibility.
 
 ## Example request
 
@@ -72,7 +74,7 @@ curl -G "https://api.gugudata.io/v1/location/coordinateconverter" \
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+The response body contains the fields below for successful conversions.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -83,27 +85,27 @@ The response body contains the fields below for successful JSON responses. For b
 | `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
 | `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
 | `data` | `object` | Yes | Primary response payload returned by the endpoint. |
-| `data.coordinateFrom` | `string` | Yes | Source coordinate system (WGS84, GCJ02, or BD09) |
-| `data.coordinateTo` | `string` | Yes | Target coordinate system (WGS84, GCJ02, or BD09) |
-| `data.coordinateSourceValue` | `string` | Yes | Source coordinate value in format [longitude,latitude] |
-| `data.coordinateDestinationValue` | `string` | Yes | Converted coordinate value in format [longitude,latitude] |
+| `data.coordinateFrom` | `string` | Yes | Normalized source coordinate system. |
+| `data.coordinateTo` | `string` | Yes | Normalized target coordinate system. |
+| `data.coordinateSourceValue` | `string` | Yes | Source coordinate pair supplied by the caller. |
+| `data.coordinateDestinationValue` | `string` | Yes | Converted coordinate pair in longitude-latitude order with six decimal places. |
 
 ## Response example
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "from=WGS84&to=GCJ02&value=[120.54,32.74]",
     "statusCode": 100,
     "statusDescription": "请求成功。",
-    "responseDateTime": "2026-04-10T00:00:00Z",
-    "dataTotalCount": 1,
-    "requestParameter": ""
+    "responseDateTime": "2026-08-24 20:38:05.155",
+    "dataTotalCount": 1
   },
   "data": {
-    "coordinateFrom": "sample value",
-    "coordinateTo": "sample value",
-    "coordinateSourceValue": "sample value",
-    "coordinateDestinationValue": "sample value"
+    "coordinateFrom": "WGS84",
+    "coordinateTo": "GCJ02",
+    "coordinateSourceValue": "[120.54,32.74]",
+    "coordinateDestinationValue": "[120.544394,32.737947]"
   }
 }
 ```
@@ -120,15 +122,15 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
 | `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `503` | Service temporarily unavailable. | Retry later with bounded backoff. |
 
 ## Implementation notes
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
+- Preserve longitude-latitude order when constructing the `value` parameter.
+- Validate longitude within `-180` to `180` and latitude within `-90` to `90` before sending a request.
 - Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production traffic.
 
 ## FAQ
 
@@ -146,8 +148,8 @@ No. The demo endpoint is for quick testing and examples. Use the authenticated e
 
 ## Related GuGuData APIs
 
-- [Webpage Readable Content Extraction](https://gugudata.io/details/readability)
-- [Domain SSL Certificate Information Parsing](https://gugudata.io/details/sslcertinfo)
-- [Domain DNS Information Query](https://gugudata.io/details/dnslookup)
+- [IP Address Geolocation](https://gugudata.io/details/location-ip)
+- [QR Code Generation](https://gugudata.io/details/qrcode)
+- [Wi-Fi QR Code Generation](https://gugudata.io/details/wifiqrcode)
 
 For more developer APIs, visit [GuGuData](https://gugudata.io/).
