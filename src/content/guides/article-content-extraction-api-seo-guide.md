@@ -5,7 +5,7 @@ description: >-
   request parameters, response fields, error handling, and practical examples.
 slug: article-content-extraction-api-seo-guide
 date: '2026-07-08'
-updated: '2026-08-07'
+updated: '2026-08-25'
 category: SEO
 apiName: Article Content Extraction API
 apiMethod: POST
@@ -80,7 +80,7 @@ Example request:
 curl -X POST "https://api.gugudata.io/v1/websitetools/fetchcontent?appkey=YOUR_APPKEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://blog.cloudflare.com/q1-2024-internet-disruption-summary"
+    "url": "https://gugudata.github.io/gugudata-io/guides/article-content-extraction-api-seo-guide/"
   }'
 ```
 
@@ -88,15 +88,15 @@ curl -X POST "https://api.gugudata.io/v1/websitetools/fetchcontent?appkey=YOUR_A
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `url` | `string` | Source URL. |
+| `url` | `string` | Final article URL after redirects. |
 | `title` | `string` | Extracted article title when available. |
 | `description` | `string` | Article summary or page description when available. |
 | `content` | `string` | Readable article HTML. |
-| `contentText` | `string` | Plain text extracted from the article content. |
+| `contentText` | `string` | Plain text with article paragraph boundaries preserved as line breaks. |
 | `image` | `string` | Primary article image URL when available. |
 | `images` | `array<object>` | Article image candidates with source URL, absolute URL, alt text, width, and height. |
 | `author` | `string` | Article author when available. |
-| `published` | `string` | Published time when available. |
+| `published` | `string` | Normalized published time when available, typically `YYYY-MM-DD HH:mm`. |
 | `source` | `string` | Source domain or publisher. |
 
 Example response shape:
@@ -110,11 +110,11 @@ Example response shape:
     "dataTotalCount": 1
   },
   "data": {
-    "url": "https://example.com/article",
+    "url": "https://example.com/articles/final",
     "title": "Example article title",
     "description": "A short page description",
     "content": "<article><p>Readable article HTML...</p></article>",
-    "contentText": "Readable article text...",
+    "contentText": "Readable article text...\nA second paragraph...",
     "image": "https://example.com/cover.jpg",
     "images": [
       {
@@ -126,7 +126,7 @@ Example response shape:
       }
     ],
     "author": "Example Author",
-    "published": "2026-07-08T00:00:00Z",
+    "published": "2026-07-08 00:00",
     "source": "example.com"
   }
 }
@@ -231,7 +231,9 @@ Use Article Content Extraction when the source is an article and the target is a
 | `401` | Missing or unknown application key. | Check your `appkey`. |
 | `403` | Access or payment issue. | Check subscription and endpoint access. |
 | `429` | Rate limit reached. | Reduce concurrency or retry later. |
-| `503` | Target page or extraction service unavailable. | Retry later and keep the failed URL for review. |
+| `422` | The page is not HTML, has no extractable article body, is too large, or redirects too many times. | Review the target page and use an endpoint suited to its content type. |
+| `502` | The target website timed out, failed at the network layer, or returned a server error. | Retry conservatively and keep the failed URL for review. |
+| `503` | The extraction service is temporarily unavailable. | Retry later without changing the request. |
 
 ## FAQ
 
