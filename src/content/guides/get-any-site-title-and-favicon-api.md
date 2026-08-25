@@ -1,13 +1,13 @@
 ---
-title: Get Any Site Title and Favicon API Integration Guide
+title: Website Metadata and Favicon API Integration Guide
 description: >-
-  Learn how to integrate the Get Any Site Title and Favicon API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Fetch website titles, verified favicon URLs, descriptions, and keywords for
+  link previews, directories, company profiles, and enrichment workflows.
 slug: get-any-site-title-and-favicon-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-25'
 category: Website Tools
-apiName: Get Any Site Title and Favicon
+apiName: Website Metadata and Favicon API
 apiMethod: GET
 apiEndpoint: /v1/websitetools/favicon
 detailUrl: 'https://gugudata.io/details/favicon'
@@ -21,9 +21,9 @@ keywords:
 featured: false
 ---
 
-# Get Any Site Title and Favicon API Integration Guide
+# Website Metadata and Favicon API Integration Guide
 
-The Get Any Site Title and Favicon API from GuGuData helps developers fetch a webpage title, favicon URL, and related metadata from a target website.
+The Website Metadata and Favicon API from GuGuData returns a public page title, a usable favicon URL, description, and keywords from a URL or domain. When a page has no usable website icon, the response keeps the metadata and returns `favicon: null`.
 
 
 
@@ -33,7 +33,7 @@ The Get Any Site Title and Favicon API from GuGuData helps developers fetch a we
 
 | Item | Value |
 | --- | --- |
-| API name | Get Any Site Title and Favicon |
+| API name | Website Metadata and Favicon API |
 | Category | Website Tools APIs |
 | Method | `GET` |
 | Endpoint | `https://api.gugudata.io/v1/websitetools/favicon` |
@@ -44,9 +44,9 @@ The Get Any Site Title and Favicon API from GuGuData helps developers fetch a we
 
 ## When to use this API
 
-- Fetch a site title and favicon for link previews.
+- Fetch a site title and usable favicon for link previews.
 - Enrich bookmark, CRM, and discovery tools.
-- Normalize website metadata for UI cards.
+- Normalize title, description, and keyword metadata for UI cards.
 
 ## Request parameters
 
@@ -55,19 +55,19 @@ This endpoint accepts parameters through the query string. Keep `appkey` out of 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `url` | `string` | Yes | - | Target webpage URL. |
+| `url` | `string` | Yes | - | Public HTTP or HTTPS URL or domain. Domains without a scheme use HTTPS. |
 
 ## Example request
 
 ```bash
 curl -G "https://api.gugudata.io/v1/websitetools/favicon" \
   --data-urlencode "appkey=YOUR_APPKEY" \
-  --data-urlencode "url=https://example.com/article"
+  --data-urlencode "url=https://gugudata.io/"
 ```
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+The response body contains the fields below for successful requests.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -78,7 +78,9 @@ The response body contains the fields below for successful JSON responses. For b
 | `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
 | `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
 | `data.title` | `string` | Yes | Site title |
-| `data.favicon` | `string` | Yes | Site favicon |
+| `data.favicon` | `string \| null` | Yes | Usable favicon URL, or `null` when the page has no usable website icon. |
+| `data.description` | `string` | Yes | Site description, or an empty string when unavailable. |
+| `data.keywords` | `string` | Yes | Site keywords, or an empty string when unavailable. |
 
 ## Response example
 
@@ -87,14 +89,16 @@ The response body contains the fields below for successful JSON responses. For b
   "dataStatus": {
     "statusCode": 200,
     "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
+    "responseDateTime": "2026-08-25T08:00:00Z",
     "dataTotalCount": 1,
     "status": "SUCCESS",
-    "requestParameter": ""
+    "requestParameter": "url=https://gugudata.io/"
   },
   "data": {
-    "title": "sample value",
-    "favicon": "sample value"
+    "title": "GuGuData.io - Unlimited API Marketplace",
+    "favicon": "https://gugudata.io/favicon.ico",
+    "description": "Production-ready APIs for data, documents, websites, and automation.",
+    "keywords": "API marketplace, developer APIs"
   }
 }
 ```
@@ -110,14 +114,15 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `401` | Missing or unknown application key. | Send a valid appkey with the request. |
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `502` | The target timed out, refused the request, returned non-HTML content, or returned an invalid response. | Check the target page and retry later if the failure is temporary. |
+| `503` | Website metadata capability is temporarily unavailable. | Retry later or contact support if the error persists. |
 
 ## Implementation notes
 
 - Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
+- Keep server-side retries conservative for `429`, `502`, and `503` responses.
 - Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
+- Treat `favicon: null` as a valid result and render a product-defined placeholder when needed.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
 - Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
 
