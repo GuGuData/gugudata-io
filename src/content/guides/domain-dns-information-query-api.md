@@ -1,13 +1,13 @@
 ---
-title: Domain DNS Information Query API Integration Guide
+title: DNS Lookup API Integration Guide
 description: >-
-  Learn how to integrate the Domain DNS Information Query API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Query complete A, AAAA, MX, TXT, NS, CNAME, SRV, and SOA records with a
+  structured DNS lookup API for diagnostics, monitoring, and security review.
 slug: domain-dns-information-query-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-25'
 category: Website Tools
-apiName: Domain DNS Information Query
+apiName: DNS Lookup and Troubleshooting API
 apiMethod: GET
 apiEndpoint: /v1/websitetools/dns-lookup
 detailUrl: 'https://gugudata.io/details/dnslookup'
@@ -21,11 +21,9 @@ keywords:
 featured: false
 ---
 
-# Domain DNS Information Query API Integration Guide
+# DNS Lookup API Integration Guide
 
-The Domain DNS Information Query API from GuGuData helps developers look up DNS records for a domain name and return the parsed DNS response data.
-
-
+The GuGuData DNS Lookup API returns complete, structured DNS records for a domain or HTTP(S) URL. Use it to investigate mail routing, ownership checks, service discovery, authoritative nameservers, and domain configuration changes without parsing command-line output.
 
 > Start here: [Try the live demo](https://api.gugudata.io/v1/websitetools/dns-lookup/demo) or [view the current API details](https://gugudata.io/details/dnslookup).
 
@@ -33,7 +31,7 @@ The Domain DNS Information Query API from GuGuData helps developers look up DNS 
 
 | Item | Value |
 | --- | --- |
-| API name | Domain DNS Information Query |
+| API name | DNS Lookup and Troubleshooting API |
 | Category | Website Tools APIs |
 | Method | `GET` |
 | Endpoint | `https://api.gugudata.io/v1/websitetools/dns-lookup` |
@@ -44,9 +42,10 @@ The Domain DNS Information Query API from GuGuData helps developers look up DNS 
 
 ## When to use this API
 
-- Inspect DNS records for debugging and validation.
-- Build domain diagnostics into support tools.
-- Automate DNS checks for monitored domains.
+- Review A and AAAA routing before a website launch or migration.
+- Validate MX, TXT, and SOA values during email and domain ownership troubleshooting.
+- Compare NS and CNAME changes in monitoring and incident workflows.
+- Inspect SRV records used for service discovery.
 
 ## Request parameters
 
@@ -55,19 +54,19 @@ This endpoint accepts parameters through the query string. Keep `appkey` out of 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `domain` | `string` | Yes | - | Domain name or HTTPS origin to inspect. |
+| `domain` | `string` | Yes | - | Domain name or HTTP(S) URL to inspect. Paths, case, trailing dots, and internationalized domain names are normalized. IP addresses and other URL schemes are rejected. |
 
 ## Example request
 
 ```bash
 curl -G "https://api.gugudata.io/v1/websitetools/dns-lookup" \
   --data-urlencode "appkey=YOUR_APPKEY" \
-  --data-urlencode "domain=example.com"
+  --data-urlencode "domain=https://gugudata.io/docs"
 ```
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+Successful responses group records by type. Missing record groups are omitted. A valid domain that does not exist returns HTTP `200`, business status `200`, and `data: {}`.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -77,12 +76,12 @@ The response body contains the fields below for successful JSON responses. For b
 | `dataStatus.statusDescription` | `string` | Yes | Application-level status message returned by the API response. |
 | `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
 | `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `data.*` | `string` | Yes | Resolved record types, including: A, AAAA, MX, TXT, NS, CNAME, SRV, PTR, SOA |
-| `data.*.domain` | `string` | Yes | The resolved domain |
-| `data.*.ttl` | `string` | Yes | TTL of the record |
-| `data.*.class` | `string` | Yes | Class of the record |
-| `data.*.type` | `string` | Yes | Type of the record |
-| `data.*.value` | `string` | Yes | Value of the record |
+| `data.{recordType}` | `array` | No | Records grouped under `A`, `AAAA`, `MX`, `TXT`, `NS`, `CNAME`, `SRV`, or `SOA`. Groups without records are omitted. |
+| `data.{recordType}[].domain` | `string` | Yes | Absolute owner name of the record. |
+| `data.{recordType}[].ttl` | `string` | Yes | Record time to live in seconds, returned as a string. |
+| `data.{recordType}[].class` | `string` | Yes | DNS record class, normally `IN`. |
+| `data.{recordType}[].type` | `string` | Yes | DNS record type for this array item. |
+| `data.{recordType}[].value` | `string` | Yes | Complete record value. MX, SRV, and SOA retain all fields; multi-part TXT values are joined in order. |
 
 ## Response example
 
@@ -91,18 +90,56 @@ The response body contains the fields below for successful JSON responses. For b
   "dataStatus": {
     "statusCode": 200,
     "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
+    "responseDateTime": "2026-08-25 00:00:00+0000",
     "dataTotalCount": 1,
     "status": "SUCCESS",
-    "requestParameter": ""
+    "requestParameter": "domain=gugudata.io"
   },
   "data": {
-    "*": "sample value",
-    "*.domain": "sample value",
-    "*.ttl": "sample value",
-    "*.class": "sample value",
-    "*.type": "sample value"
+    "MX": [
+      {
+        "domain": "gugudata.io.",
+        "ttl": "300",
+        "class": "IN",
+        "type": "MX",
+        "value": "11 route3.mx.cloudflare.net."
+      }
+    ],
+    "TXT": [
+      {
+        "domain": "gugudata.io.",
+        "ttl": "300",
+        "class": "IN",
+        "type": "TXT",
+        "value": "v=spf1 include:_spf.mx.cloudflare.net ~all"
+      }
+    ],
+    "SOA": [
+      {
+        "domain": "gugudata.io.",
+        "ttl": "1800",
+        "class": "IN",
+        "type": "SOA",
+        "value": "iris.ns.cloudflare.com. dns.cloudflare.com. 2412527907 10000 2400 604800 1800"
+      }
+    ]
   }
+}
+```
+
+For a valid nonexistent domain, the response remains successful and contains an empty object:
+
+```json
+{
+  "dataStatus": {
+    "statusCode": 200,
+    "status": "SUCCESS",
+    "statusDescription": "successfully",
+    "responseDateTime": "2026-08-25 00:00:00+0000",
+    "dataTotalCount": 1,
+    "requestParameter": "domain=postman-ci.invalid"
+  },
+  "data": {}
 }
 ```
 
@@ -117,16 +154,15 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `401` | Missing or unknown application key. | Send a valid appkey with the request. |
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `500` | DNS lookup service unavailable or internal service error. | Retry once after a short delay, then contact support if the error persists. |
 
 ## Implementation notes
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+- Validate required parameters before sending the request so malformed domains return quickly.
+- Treat HTTP `200` with `data: {}` as a valid nonexistent domain, not as a service failure.
+- Compare full record values rather than only the first token of MX, SRV, TXT, or SOA data.
+- Cache results for no longer than the record TTL when your workflow permits caching.
+- Use the demo endpoint for a connectivity check, then use the authenticated endpoint for production data.
 
 ## FAQ
 
