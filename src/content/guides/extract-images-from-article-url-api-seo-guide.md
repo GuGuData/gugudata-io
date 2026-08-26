@@ -5,7 +5,7 @@ description: >-
   request parameters, response fields, error handling, and practical examples.
 slug: extract-images-from-article-url-api-seo-guide
 date: '2026-07-08'
-updated: '2026-08-07'
+updated: '2026-08-26'
 category: SEO
 apiName: Extract Images from Article URL API
 apiMethod: POST
@@ -33,6 +33,8 @@ featured: false
 Images are part of the SEO record of an article. They influence visual presentation, social previews, content quality checks, media reuse, image search opportunities, and editorial QA. But extracting the right images from an article page can be harder than it looks. A public webpage often includes logos, avatars, icons, ads, tracking pixels, recommendations, and unrelated layout images.
 
 The [GuGuData Extract Images from Article URL API](https://gugudata.io/details/fetchcontentimages) focuses on image candidates from the readable article area. It returns normalized image URLs with alt text and available width and height attributes, making it useful for SEO image audits, content ingestion, and media workflows.
+
+![Article image extraction API workflow](https://cdn.gugudata.io/api-covers/api-covers_fetchcontentimages.jpg)
 
 This guide explains how to use the API, how to evaluate image results, and where it fits with other GuGuData web extraction APIs.
 
@@ -81,7 +83,7 @@ Example request:
 curl -X POST "https://api.gugudata.io/v1/websitetools/fetchcontentimages?appkey=YOUR_APPKEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://blog.cloudflare.com/q1-2024-internet-disruption-summary"
+    "url": "https://gugudata.github.io/gugudata-io/guides/extract-images-from-article-url-api-seo-guide/"
   }'
 ```
 
@@ -89,13 +91,13 @@ curl -X POST "https://api.gugudata.io/v1/websitetools/fetchcontentimages?appkey=
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `url` | `string` | Source URL. |
+| `url` | `string` | Final article URL after redirects. |
 | `images` | `array<object>` | Extracted article image candidates. |
 | `images.src` | `string` | Original image source value from the page. |
 | `images.absoluteUrl` | `string` | Absolute image URL. |
 | `images.alt` | `string` | Image alt text when available. |
-| `images.width` | `string` | Image width attribute when available. |
-| `images.height` | `string` | Image height attribute when available. |
+| `images.width` | `string \| null` | Declared image width, or `null` when unavailable. |
+| `images.height` | `string \| null` | Declared image height, or `null` when unavailable. |
 
 Example response:
 
@@ -108,14 +110,14 @@ Example response:
     "dataTotalCount": 1
   },
   "data": {
-    "url": "https://example.com/article",
+    "url": "https://gugudata.github.io/gugudata-io/guides/extract-images-from-article-url-api-seo-guide/",
     "images": [
       {
-        "src": "/assets/article-cover.jpg",
-        "absoluteUrl": "https://example.com/assets/article-cover.jpg",
-        "alt": "Dashboard showing weekly SEO traffic",
-        "width": "1200",
-        "height": "630"
+        "src": "https://cdn.gugudata.io/api-covers/api-covers_fetchcontentimages.jpg",
+        "absoluteUrl": "https://cdn.gugudata.io/api-covers/api-covers_fetchcontentimages.jpg",
+        "alt": "Article image extraction API workflow",
+        "width": null,
+        "height": null
       }
     ]
   }
@@ -196,6 +198,7 @@ If you already call Article Content Extraction and it returns enough image data 
 - Keep `appkey` on your backend.
 - Normalize and deduplicate `absoluteUrl` before storing results.
 - Treat `width` and `height` as page attributes when available, not guaranteed measured dimensions.
+- Treat `images: []` as a successful result when a readable article has no image candidates.
 - Save the source article URL with every image record.
 - Recheck important URLs periodically because article images can change after publishing.
 - Combine image extraction with article title and publish date for better reporting.
@@ -209,14 +212,21 @@ If you already call Article Content Extraction and it returns enough image data 
 | `400` | Missing or invalid URL. | Validate URL format and request body. |
 | `401` | Missing or unknown application key. | Check your `appkey`. |
 | `403` | Access or payment issue. | Check subscription and endpoint access. |
+| `422` | The target is not readable HTML, has no article body, is too large, or redirects too many times. | Confirm the target is a public article page and try a smaller page. |
 | `429` | Rate limit reached. | Reduce concurrency or retry later. |
-| `503` | Target page or extraction service unavailable. | Retry later and keep the failed URL for review. |
+| `500` | An unexpected processing error occurred. | Record the request time and contact support if it persists. |
+| `502` | The target timed out, failed at the network layer, or returned a server error. | Retry later and keep the failed URL for review. |
+| `503` | The extraction service is temporarily unavailable. | Retry later with bounded backoff. |
 
 ## FAQ
 
 ### Does this return every image on the page?
 
 The API focuses on image candidates from the readable article area. That makes it better for article media workflows than a raw page image scrape.
+
+### What happens when the article has no images?
+
+The request still succeeds and returns `images: []`. This is distinct from a page that cannot be fetched or does not contain readable article content.
 
 ### Can I use this for image SEO audits?
 
