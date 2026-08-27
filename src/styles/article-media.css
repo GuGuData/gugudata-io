@@ -37,4 +37,10 @@
     margin-block: 22px;
     border-radius: 12px;
   }
+
+  .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
