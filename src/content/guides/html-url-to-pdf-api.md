@@ -1,11 +1,11 @@
 ---
-title: HTML/URL to PDF API Integration Guide
+title: HTML and URL to PDF API Integration Guide
 description: >-
-  Learn how to integrate the HTML/URL to PDF API with documented request
-  parameters, response fields, error handling, and practical examples.
+  Convert HTML content or public web pages into portrait or landscape PDF files
+  and receive a downloadable HTTPS URL.
 slug: html-url-to-pdf-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-27'
 category: Documents & Images
 apiName: HTML/URL to PDF
 apiMethod: POST
@@ -13,132 +13,126 @@ apiEndpoint: /v1/imagerecognition/html2pdf
 detailUrl: 'https://gugudata.io/details/html2pdf'
 demoUrl: 'https://api.gugudata.io/v1/imagerecognition/html2pdf/demo'
 keywords:
-  - HTML/URL to PDF API
-  - GuGuData HTML/URL to PDF
-  - html2pdf API
-  - Document and Image APIs
-  - developer API documentation
+  - HTML to PDF API
+  - URL to PDF API
+  - webpage to PDF API
+  - landscape PDF API
+  - document automation API
 featured: false
 ---
 
-# HTML/URL to PDF API Integration Guide
+# HTML and URL to PDF API Integration Guide
 
-The HTML/URL to PDF API from GuGuData helps developers render HTML or a target URL as PDF and return generated PDF metadata.
+The GuGuData HTML/URL to PDF API converts either an HTML document or a public web page into an A4 PDF. The response contains a public HTTPS URL for the generated file.
 
-
-
-> Start here: [Try the live demo](https://api.gugudata.io/v1/imagerecognition/html2pdf/demo) or [view the current API details](https://gugudata.io/details/html2pdf).
+> Start with the [live demo](https://api.gugudata.io/v1/imagerecognition/html2pdf/demo), then review the [API detail page](https://gugudata.io/details/html2pdf) for current subscription information.
 
 ## API details
 
 | Item | Value |
 | --- | --- |
-| API name | HTML/URL to PDF |
-| Category | Document and Image APIs |
 | Method | `POST` |
 | Endpoint | `https://api.gugudata.io/v1/imagerecognition/html2pdf` |
 | Content type | `application/json` |
-| Demo endpoint | [https://api.gugudata.io/v1/imagerecognition/html2pdf/demo](https://api.gugudata.io/v1/imagerecognition/html2pdf/demo) |
-| Detail page | [https://gugudata.io/details/html2pdf](https://gugudata.io/details/html2pdf) |
-| OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
+| Authentication | `appkey` query parameter |
+| Output | A public HTTPS PDF URL |
+| Demo | [HTML/URL to PDF demo](https://api.gugudata.io/v1/imagerecognition/html2pdf/demo) |
+| OpenAPI | [OpenAPI 3.1 JSON](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
 
-## When to use this API
+## Common uses
 
-- Generate invoices, receipts, and reports from HTML templates.
-- Archive public web pages as PDF files for compliance workflows.
-- Create printable documents from CMS content without maintaining a browser stack.
+- Generate invoices, receipts, statements, and reports from HTML templates.
+- Archive public web pages as fixed-layout PDF records.
+- Produce printable documents for review and approval workflows.
+- Create portrait or landscape exports without maintaining a browser runtime.
 
-## Request parameters
+## Request body
 
-This endpoint accepts parameters through the query string plus request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+| Field | Type | Required | Rules |
+| --- | --- | --- | --- |
+| `type` | `string` | Yes | `html` or `url`, case-insensitive. |
+| `content` | `string` | Yes | HTML up to 5 MiB, or a complete public HTTP/HTTPS URL up to 2048 characters. |
+| `landscape` | `integer` | No | `0` for portrait, `1` for landscape. Default: `0`. |
 
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `type` | `string` | Yes | - | Endpoint-specific type selector. Refer to the endpoint description for supported values. |
-| `content` | `string` | Yes | - | Primary text content processed by the endpoint. |
-| `landscape` | `integer` | No | `0` | Whether the generated PDF should use landscape orientation. |
+The URL mode accepts public HTTP and HTTPS destinations on standard ports. It does not accept IP-address targets, credential-bearing URLs, private hostnames, or other URL schemes.
 
-## Example request
+## HTML example
 
 ```bash
 curl -X POST "https://api.gugudata.io/v1/imagerecognition/html2pdf?appkey=YOUR_APPKEY" \
   -H "Content-Type: application/json" \
-  -d '
-{
-  "type": "URL",
-  "content": "https://example.com/article",
-  "landscape": 0
-}
-'
+  -d '{
+    "type": "html",
+    "content": "<html><body><h1>Quarterly report</h1><p>Prepared for review.</p></body></html>",
+    "landscape": 0
+  }'
 ```
 
-## Response fields
+## URL example
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+```bash
+curl -X POST "https://api.gugudata.io/v1/imagerecognition/html2pdf?appkey=YOUR_APPKEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "url",
+    "content": "https://gugudata.github.io/gugudata-io/guides/html-url-to-pdf-api/",
+    "landscape": 1
+  }'
+```
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `DataStatus.StatusCode` | `integer` | Yes | Application-level status code returned by the API response. |
-| `DataStatus.StatusDescription` | `string` | Yes | Application-level status message returned by the API response. |
-| `DataStatus.ResponseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
-| `DataStatus.DataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `Data` | `string` | Yes | Primary response payload returned by the endpoint. |
-
-## Response example
+## Successful response
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "type=html&content_length=101&landscape=0",
     "statusCode": 200,
+    "status": "SUCCESS",
     "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
+    "responseDateTime": "2026-08-27 12:00:00+0000",
     "dataTotalCount": 1
   },
-  "data": "sample value"
+  "data": {
+    "pdfPath": "https://storage.gugudata.io/pdf/86bb28cb-0e7d-4105-a080-6c5c2fe4c451.pdf"
+  }
 }
 ```
 
-## HTTP status codes
-
-Use the HTTP status code for transport-level handling. If the response body contains `dataStatus.statusCode`, treat it as an application-level status field in the JSON payload.
-
-| HTTP status | Meaning | Recommended handling |
+| Field | Type | Description |
 | --- | --- | --- |
-| `200` | Request processed successfully. | Parse the documented response body for the endpoint result. |
-| `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
-| `401` | Missing or unknown application key. | Send a valid appkey with the request. |
-| `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
-| `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `dataStatus.statusCode` | `integer` | Business status code. `200` indicates success. |
+| `dataStatus.requestParameter` | `string` | A safe request summary that excludes HTML, URL query strings, fragments, and the AppKey. |
+| `data.pdfPath` | `string` | Public HTTPS URL of the generated PDF. |
 
-## Implementation notes
+Download the file from `data.pdfPath` after the conversion succeeds. Generated URLs are unique, so store the returned value with your own document record when later access is required.
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+## Error handling
 
-## FAQ
+| HTTP status | Meaning | Recommended action |
+| --- | --- | --- |
+| `400` | Missing fields, invalid JSON, unsupported type, invalid URL, or invalid landscape value. | Correct the request before retrying. |
+| `401` | AppKey is missing or unknown. | Send a valid AppKey in the query string. |
+| `403` | The AppKey is not authorized for this product. | Check the subscription or authorization state. |
+| `422` | The supplied HTML or URL could not be rendered. | Review the input and page availability. |
+| `429` | Request or trial limit exceeded. | Reduce request frequency and retry later. |
+| `502` | The rendering provider timed out or was temporarily unavailable. | Retry later with bounded backoff. |
+| `503` | PDF rendering or storage is temporarily unavailable. | Retry later; contact support if it persists. |
 
-### Where is the official API detail page?
+Do not retry `400`, `401`, or `403` responses automatically. For `502` and `503`, use a small retry budget because each successful request produces a new PDF.
 
-The official detail page is [https://gugudata.io/details/html2pdf](https://gugudata.io/details/html2pdf). It is the best place to review the latest public endpoint information before publishing or integrating.
+## Orientation and validation checklist
 
-### Should I handle `dataStatus.statusCode` as the HTTP status code?
-
-No. Use the HTTP status code for request-level behavior such as authentication, permission, rate limiting, and server errors. Use `dataStatus.statusCode` only as the response body status field when it is present.
-
-### Can I use the demo endpoint in production?
-
-No. The demo endpoint is for quick testing and examples. Use the authenticated endpoint with your `appkey` for production workflows.
+- Use `landscape: 1` for wide tables, schedules, and dashboards.
+- Keep print-specific CSS in the submitted HTML when exact pagination matters.
+- Confirm that external fonts and images used by your document are publicly reachable.
+- Validate the returned file as `application/pdf` before passing it to another workflow.
+- Use the demo endpoint for connectivity checks only; production calls require the authenticated endpoint.
 
 ## Related GuGuData APIs
 
-- [Image OCR Extraction](https://gugudata.io/details/imagestreamocr)
 - [PDF Parsing and Formatted Output](https://gugudata.io/details/pdf2format)
 - [PDF Splitting](https://gugudata.io/details/pdf-splitter)
+- [HTML to Word](https://gugudata.io/details/html2word)
+- [Webpage Screenshot Capture](https://gugudata.io/details/url2snapshot)
 
-For more developer APIs, visit [GuGuData](https://gugudata.io/).
+Browse more developer APIs at [GuGuData](https://gugudata.io/).
