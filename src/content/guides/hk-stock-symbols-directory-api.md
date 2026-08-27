@@ -1,11 +1,11 @@
 ---
 title: HK Stock Symbols Directory API Integration Guide
 description: >-
-  Learn how to integrate the HK Stock Symbols Directory API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Search five-digit Hong Kong-listed security symbols, English short names,
+  and Chinese display names through a paginated JSON API.
 slug: hk-stock-symbols-directory-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-27'
 category: Data
 apiName: HK Stock Symbols Directory
 apiMethod: GET
@@ -13,134 +13,135 @@ apiEndpoint: /v1/stock/hk/symbols
 detailUrl: 'https://gugudata.io/details/hk-stock-symbols'
 demoUrl: 'https://api.gugudata.io/v1/stock/hk/symbols/demo'
 keywords:
-  - HK Stock Symbols Directory API
-  - GuGuData HK Stock Symbols Directory
-  - hk-stock-symbols API
-  - Metadata APIs
-  - developer API documentation
+  - HK stock symbols API
+  - Hong Kong ticker directory
+  - HK security master data
+  - Hong Kong listed securities
+  - symbol lookup API
 featured: false
 ---
 
 # HK Stock Symbols Directory API Integration Guide
 
-The HK Stock Symbols Directory API from GuGuData helps developers search Hong Kong stock ticker symbols and company names with paginated results.
+The GuGuData HK Stock Symbols Directory API helps finance applications search active Hong Kong-listed securities by five-digit symbol, exchange English short name, or Chinese display name. It returns stable, symbol-ordered pages that work well in security selectors, reference-data validation, and enrichment workflows.
 
+> Start here: [Try the live demo](https://api.gugudata.io/v1/stock/hk/symbols/demo) or [view the API details](https://gugudata.io/details/hk-stock-symbols).
 
-
-> Start here: [Try the live demo](https://api.gugudata.io/v1/stock/hk/symbols/demo) or [view the current API details](https://gugudata.io/details/hk-stock-symbols).
-
-## API details
+## API overview
 
 | Item | Value |
 | --- | --- |
-| API name | HK Stock Symbols Directory |
-| Category | Metadata APIs |
 | Method | `GET` |
 | Endpoint | `https://api.gugudata.io/v1/stock/hk/symbols` |
-| Content type | `query parameters` |
-| Demo endpoint | [https://api.gugudata.io/v1/stock/hk/symbols/demo](https://api.gugudata.io/v1/stock/hk/symbols/demo) |
+| Demo | [https://api.gugudata.io/v1/stock/hk/symbols/demo](https://api.gugudata.io/v1/stock/hk/symbols/demo) |
 | Detail page | [https://gugudata.io/details/hk-stock-symbols](https://gugudata.io/details/hk-stock-symbols) |
-| OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
+| Main use case | Search and validate Hong Kong-listed security reference data |
 
-## When to use this API
-
-- Search Hong Kong stock symbols and company names.
-- Build ticker lookup in finance tools.
-- Normalize Hong Kong market symbol metadata.
+This is a symbol directory, not a real-time quote, price-history, or trading API.
 
 ## Request parameters
 
-This endpoint accepts parameters through the query string. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
-
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `query` | `string` | No | - | Search keyword used for partial matching against the documented dataset fields. |
-| `pageIndex` | `integer` | No | `1` | One-based page index for pagination. |
-| `pageSize` | `integer` | No | `20` | Number of records returned per page. |
+| `appkey` | `string` | Yes | - | GuGuData application key, sent as a query parameter from a trusted server environment. |
+| `query` | `string` | No | Empty | Case-insensitive substring matched against symbol, English short name, and Chinese display name. Surrounding whitespace is ignored. Maximum 100 Unicode characters. |
+| `pageIndex` | `integer` | No | `1` | One-based page index. Values below 1 are rejected. |
+| `pageSize` | `integer` | No | `20` | Records per page. Zero also uses 20, values from 1 to 20 are preserved, and larger values are reduced to 20. Negative values are rejected. |
 
-## Example request
+Search for Tencent by symbol:
 
 ```bash
 curl -G "https://api.gugudata.io/v1/stock/hk/symbols" \
   --data-urlencode "appkey=YOUR_APPKEY" \
-  --data-urlencode "query=AAPL" \
+  --data-urlencode "query=00700" \
   --data-urlencode "pageIndex=1" \
   --data-urlencode "pageSize=20"
 ```
 
+You can also search with an English or Chinese name:
+
+```bash
+curl -G "https://api.gugudata.io/v1/stock/hk/symbols" \
+  --data-urlencode "appkey=YOUR_APPKEY" \
+  --data-urlencode "query=腾讯"
+```
+
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+| Field | Type | Description |
+| --- | --- | --- |
+| `dataStatus.requestParameter` | `string` | Normalized query and pagination values. The application key is not included. |
+| `dataStatus.statusCode` | `integer` | Application-level status code. A successful directory lookup returns `100`. |
+| `dataStatus.statusDescription` | `string` | Application-level status description. |
+| `dataStatus.responseDateTime` | `string` | Response timestamp in `YYYY-MM-DD HH:mm:ss.SSS` format. |
+| `dataStatus.dataTotalCount` | `integer` | Total number of active records matching the query. |
+| `data` | `array<object>` | Symbol-ordered result page. It is an empty array when no records match. |
+| `data[].symbol` | `string` | Five-digit Hong Kong-listed security symbol, such as `00700`. |
+| `data[].stockName` | `string` | Exchange English short name, such as `TENCENT`. |
+| `data[].stockChineseName` | `string` | Chinese display name, such as `腾讯控股`. |
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `dataStatus` | `object` | Yes | Response metadata. `dataStatus.statusCode` is a response body status field, not the HTTP status code. |
-| `dataStatus.requestParameter` | `string` | Yes | Normalized request parameters echoed by the service. Sensitive credentials are omitted when available. |
-| `dataStatus.statusCode` | `integer` | Yes | Response body status field. Successful demo responses currently return `100`. |
-| `dataStatus.statusDescription` | `string` | Yes | Response body status message. Successful demo responses currently return a Chinese message. |
-| `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
-| `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `data` | `array<string>` | Yes | Primary response payload returned by the endpoint. |
-| `data[].symbol` | `string` | Yes | HK stock ticker symbol |
-| `data[].stockName` | `string` | Yes | English company name returned by the dataset. |
-| `data[].stockChineseName` | `string` | Yes | Traditional Chinese company name returned by the dataset. |
-
-## Response example
+Example response:
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "query=00700&pageindex=1&pagesize=20",
     "statusCode": 100,
-    "statusDescription": "请求成功",
-    "responseDateTime": "2026-04-10T00:00:00Z",
-    "dataTotalCount": 1,
-    "requestParameter": ""
+    "statusDescription": "请求成功。",
+    "responseDateTime": "2026-08-27 10:57:00.000",
+    "dataTotalCount": 1
   },
-  "data": "sample value"
+  "data": [
+    {
+      "symbol": "00700",
+      "stockName": "TENCENT",
+      "stockChineseName": "腾讯控股"
+    }
+  ]
 }
 ```
 
-## HTTP status codes
+If the search has no match or the requested page is beyond the final page, the request still succeeds with `data: []` and `dataTotalCount: 0`.
 
-Use the HTTP status code for transport-level handling. If the response body contains `dataStatus.statusCode`, treat it as an application-level status field in the JSON payload.
+## Integration patterns
+
+### Security selectors
+
+Query as the user types, display the five-digit symbol with both names, and store the symbol as the stable lookup value. Debounce interactive searches so the interface does not send a request for every keystroke.
+
+### Reference-data validation
+
+Use an exact symbol search before accepting a Hong Kong security identifier. A successful HTTP response with an empty `data` array means the directory has no matching active record.
+
+### Paginated synchronization
+
+Request pages in order, retain `dataTotalCount` for progress, and stop when a page is empty. Because results are ordered by symbol, repeated directory reads are predictable for comparison and review.
+
+## HTTP status handling
 
 | HTTP status | Meaning | Recommended handling |
 | --- | --- | --- |
-| `200` | Request processed successfully. | Parse the documented response body for the endpoint result. |
-| `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
-| `401` | Missing or unknown application key. | Send a valid appkey with the request. |
-| `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
-| `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `200` | Search completed, including empty results. | Read `dataTotalCount` and process the `data` array. |
+| `400` | Query or pagination value is invalid. | Correct the parameter before retrying. |
+| `401` | Application key is missing or unknown. | Send a valid key from the server side. |
+| `403` | The key does not have access to this API. | Check the subscription and authorization. |
+| `429` | Request limit reached. | Reduce concurrency and retry after the limit window. |
+| `500` | The request could not be completed. | Retry later or contact support if it persists. |
+| `503` | The symbol directory is temporarily unavailable. | Retry with bounded backoff. |
 
-## Implementation notes
+Always use the HTTP status for request-level handling. `dataStatus.statusCode` is a separate application-level field inside the JSON response.
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+## Practical recommendations
 
-## FAQ
-
-### Where is the official API detail page?
-
-The official detail page is [https://gugudata.io/details/hk-stock-symbols](https://gugudata.io/details/hk-stock-symbols). It is the best place to review the latest public endpoint information before publishing or integrating.
-
-### Should I handle `dataStatus.statusCode` as the HTTP status code?
-
-No. Use the HTTP status code for request-level behavior such as authentication, permission, rate limiting, and server errors. Use `dataStatus.statusCode` only as the response body status field when it is present.
-
-### Can I use the demo endpoint in production?
-
-No. The demo endpoint is for quick testing and examples. Use the authenticated endpoint with your `appkey` for production workflows.
+- Keep `appkey` in backend configuration rather than browser code or mobile bundles.
+- Store symbols as strings so leading zeroes are preserved.
+- Do not convert `00700` to the number `700`.
+- Treat names as display and search fields; use `symbol` for identifier matching.
+- Cache stable directory results when suitable for your product, while keeping a clear refresh policy.
+- Do not use this directory as evidence of current price, trading status, or investment suitability.
 
 ## Related GuGuData APIs
 
-- [Global QS World University Rankings](https://gugudata.io/details/qs-global-university-ranking)
-- [Chinese Classical Poetry Database](https://gugudata.io/details/chinesepoem)
-- [Global University Data](https://gugudata.io/details/global-university)
+- [US Stock Symbols Directory](https://gugudata.io/details/us-stock-symbols): search US-listed security reference records.
 
 For more developer APIs, visit [GuGuData](https://gugudata.io/).
