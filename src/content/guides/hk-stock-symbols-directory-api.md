@@ -21,6 +21,17 @@ keywords:
 featured: false
 ---
 
+<style>
+  @media (max-width: 640px) {
+    .article .prose table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: normal;
+    }
+  }
+</style>
+
 # HK Stock Symbols Directory API Integration Guide
 
 The GuGuData HK Stock Symbols Directory API helps finance applications search active Hong Kong-listed securities by five-digit symbol, exchange English short name, or Chinese display name. It returns stable, symbol-ordered pages that work well in security selectors, reference-data validation, and enrichment workflows.
