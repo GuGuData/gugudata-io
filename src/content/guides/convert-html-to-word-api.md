@@ -5,7 +5,7 @@ description: >-
   archives, publishing, and business workflows.
 slug: convert-html-to-word-api
 date: '2026-04-17'
-updated: '2026-08-07'
+updated: '2026-08-28'
 category: Documents & Images
 apiName: Convert HTML to Word
 apiMethod: POST
@@ -37,7 +37,7 @@ Convert raw HTML or a publicly accessible webpage URL into an editable Word docu
 | Category | Document and Image APIs |
 | Method | `POST` |
 | Endpoint | `https://api.gugudata.io/v1/imagerecognition/html2word` |
-| Content type | `multipart/form-data` |
+| Content type | `application/json` or `multipart/form-data` |
 | Demo endpoint | [https://api.gugudata.io/v1/imagerecognition/html2word/demo](https://api.gugudata.io/v1/imagerecognition/html2word/demo) |
 | Detail page | [https://gugudata.io/details/html2word](https://gugudata.io/details/html2word) |
 
@@ -49,18 +49,30 @@ Convert raw HTML or a publicly accessible webpage URL into an editable Word docu
 
 ## Request parameters
 
-This endpoint accepts parameters through the query string plus request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+Send `appkey` in the query string and the conversion parameters in a JSON or multipart request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `content` | `string` | Yes | - | HTML string or webpage URL to convert. Send this parameter as multipart form data. |
-| `type` | `string` | Yes | `html` | Request type. Supported values are `html` and `url`. Send this parameter as multipart form data. |
-| `filename` | `string` | No | - | Optional output file name ending in `.docx`. Send this parameter as multipart form data. |
+| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key supplied as a query parameter. |
+| `content` | `string` | Yes | - | HTML markup up to 5 MiB for `html`, or a complete public HTTP/HTTPS URL up to 2,048 characters for `url`. |
+| `type` | `string` | Yes | - | Input mode: `html` or `url`. |
+| `filename` | `string` | No | Generated name | Output filename up to 128 characters. The `.docx` extension is added when omitted. |
 
 ## Example request
 
-```bash
+```bash title="JSON request"
+curl -X POST "https://api.gugudata.io/v1/imagerecognition/html2word?appkey=YOUR_APPKEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "type": "html",
+    "content": "<h1>Quarterly Report</h1><p>Summary content.</p>",
+    "filename": "quarterly-report.docx"
+  }'
+```
+
+The existing multipart format remains available for compatible integrations:
+
+```bash title="Multipart request"
 curl -X POST "https://api.gugudata.io/v1/imagerecognition/html2word?appkey=YOUR_APPKEY" \
   -F "type=html" \
   -F "content=<h1>Quarterly Report</h1><p>Summary content.</p>" \
@@ -69,7 +81,7 @@ curl -X POST "https://api.gugudata.io/v1/imagerecognition/html2word?appkey=YOUR_
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+The API returns JSON containing a public HTTPS URL for the generated DOCX file.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -89,12 +101,12 @@ The response body contains the fields below for successful JSON responses. For b
   "dataStatus": {
     "statusCode": 200,
     "statusDescription": "successfully",
-    "responseDateTime": "2026-04-17T00:00:00Z",
+    "responseDateTime": "2026-08-28 00:00:00+0000",
     "dataTotalCount": 1,
-    "requestParameter": ""
+    "requestParameter": "type=html&content_length=59"
   },
   "data": {
-    "wordPath": "https://cdn.example.com/quarterly-report.docx"
+    "wordPath": "https://storage.gugudata.io/html2word/6ae8b0dd-66bb-4bfc-b685-06746b76145d-quarterly-report.docx"
   }
 }
 ```
@@ -109,15 +121,18 @@ Use the HTTP status code for transport-level handling. If the response body cont
 | `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
 | `401` | Missing or unknown application key. | Send a valid appkey with the request. |
 | `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
+| `422` | The submitted page or HTML could not be converted. | Check that the source contains usable document content. |
 | `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
 | `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `502` | The source page could not be fetched. | Check the source URL and retry after the target site is available. |
+| `503` | The conversion capability is temporarily unavailable. | Retry later with bounded backoff. |
 
 ## Implementation notes
 
 - Choose `type=html` for raw HTML and `type=url` when the service should fetch a webpage URL.
-- Validate HTML size and source URL access before sending the request.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
+- Headings, paragraphs, lists, tables, links, and supported images can be included in the generated document.
+- Validate HTML size and source URL access before sending the request, then download the returned DOCX promptly.
+- Keep server-side retries conservative for `429`, `502`, and `503` responses.
 - Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
 - Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
 
