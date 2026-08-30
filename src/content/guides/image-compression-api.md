@@ -5,7 +5,7 @@ description: >-
   preserving aspect ratio and controlling output quality.
 slug: image-compression-api
 date: '2026-04-10'
-updated: '2026-08-29'
+updated: '2026-08-30'
 category: Documents & Images
 apiName: Image Compression
 apiMethod: POST
@@ -41,6 +41,7 @@ Compress a JPEG, PNG, or WebP upload or public image URL, optionally reduce its 
 | Demo endpoint | [https://api.gugudata.io/v1/image/image-compress/demo](https://api.gugudata.io/v1/image/image-compress/demo) |
 | Detail page | [https://gugudata.io/details/image-compress](https://gugudata.io/details/image-compress) |
 | OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
+| Demo source image | [Download the reproducible JPEG fixture](https://cdn.gugudata.io/api-fixtures/image-compress-source.jpg) |
 
 ## When to use this API
 
@@ -69,7 +70,7 @@ This endpoint accepts parameters through the query string plus request body. Kee
 ```bash
 curl -X POST "https://api.gugudata.io/v1/image/image-compress?appkey=YOUR_APPKEY" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  --data-urlencode "image_url=https://storage.gugudata.io/images/image-compress-source.jpg" \
+  --data-urlencode "image_url=https://cdn.gugudata.io/api-fixtures/image-compress-source.jpg" \
   --data-urlencode "maxWidth=1200" \
   --data-urlencode "quality=70" \
   --data-urlencode "format=jpeg" \

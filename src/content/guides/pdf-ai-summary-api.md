@@ -39,6 +39,7 @@ The PDF AI Summary API from GuGuData helps developers generate an AI summary for
 | Endpoint | `https://api.gugudata.io/v1/imagerecognition/pdf-summary` |
 | Content type | `multipart/form-data` |
 | Demo endpoint | [https://api.gugudata.io/v1/imagerecognition/pdf-summary/demo](https://api.gugudata.io/v1/imagerecognition/pdf-summary/demo) |
+| Demo source PDF | [Download the reproducible PDF fixture](https://cdn.gugudata.io/api-fixtures/pdf-summary-demo.pdf) |
 | Detail page | [https://gugudata.io/details/pdf-summary](https://gugudata.io/details/pdf-summary) |
 | OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
 
@@ -65,6 +66,8 @@ curl -X POST "https://api.gugudata.io/v1/imagerecognition/pdf-summary?appkey=YOU
   -F "file=@./sample.pdf" \
   -F "lang=en"
 ```
+
+You can download the [same PDF used by the demo](https://cdn.gugudata.io/api-fixtures/pdf-summary-demo.pdf) and submit it as `sample.pdf`.
 
 ## Response fields
 

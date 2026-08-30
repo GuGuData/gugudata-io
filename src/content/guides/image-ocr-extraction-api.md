@@ -36,6 +36,7 @@ The Image OCR Extraction API recognizes English text in an uploaded image. It re
 | Supported images | JPEG, PNG, WebP, TIFF, BMP |
 | Maximum file size | 10 MiB |
 | Demo endpoint | [Run the OCR demo](https://api.gugudata.io/v1/imagerecognition/ocr/demo) |
+| Demo source image | [Download the reproducible PNG fixture](https://cdn.gugudata.io/api-fixtures/image-ocr-demo.png) |
 | OpenAPI | [OpenAPI 3.1 JSON](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
 
 ## Request parameters
@@ -53,6 +54,8 @@ Send the application key in the query string and the image as a multipart file. 
 curl -X POST "https://api.gugudata.io/v1/imagerecognition/ocr?appkey=YOUR_APPKEY" \
   -F "imagefile=@./sample.png"
 ```
+
+You can download the [same image used by the demo](https://cdn.gugudata.io/api-fixtures/image-ocr-demo.png) and submit it as `sample.png`.
 
 ## Response fields
 
@@ -79,10 +82,10 @@ An image with no recognized English text can still be processed successfully; in
   },
   "data": {
     "resultText": [
-      "CHAPTER I",
-      "AN OBSESSION WITH TIME"
+      "GUGUDATA",
+      "DATA PAY LESS"
     ],
-    "text": "CHAPTER I\nAN OBSESSION WITH TIME"
+    "text": "GUGUDATA\nDATA PAY LESS"
   }
 }
 ```
