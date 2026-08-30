@@ -5,7 +5,7 @@ description: >-
   structured DNS lookup API for diagnostics, monitoring, and security review.
 slug: domain-dns-information-query-api
 date: '2026-04-10'
-updated: '2026-08-25'
+updated: '2026-08-30'
 category: Website Tools
 apiName: DNS Lookup and Troubleshooting API
 apiMethod: GET

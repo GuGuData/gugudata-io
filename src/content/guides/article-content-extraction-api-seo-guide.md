@@ -1,11 +1,11 @@
 ---
 title: Article Content Extraction API Integration Guide
 description: >-
-  Learn how to integrate the Article Content Extraction API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Extract LLM-ready article text, readable HTML, metadata, images, author,
+  publication time, and source for RAG, search, monitoring, and analysis.
 slug: article-content-extraction-api-seo-guide
 date: '2026-07-08'
-updated: '2026-08-25'
+updated: '2026-08-30'
 category: SEO
 apiName: Article Content Extraction API
 apiMethod: POST
@@ -24,7 +24,7 @@ keywords:
   - SEO content extraction API
   - web content extraction API
   - article parser API
-  - crawler-free content extraction
+  - structured article content
 featured: false
 ---
 

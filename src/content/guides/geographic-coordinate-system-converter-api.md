@@ -1,12 +1,11 @@
 ---
 title: Geographic Coordinate System Converter API Integration Guide
 description: >-
-  Learn how to integrate the Geographic Coordinate System Converter API with
-  documented request parameters, response fields, error handling, and practical
-  examples.
+  Convert coordinates between WGS84, GCJ-02, and BD-09 for map display,
+  geocoding, navigation, mobility, and location-data normalization.
 slug: geographic-coordinate-system-converter-api
 date: '2026-04-10'
-updated: '2026-08-24'
+updated: '2026-08-30'
 category: Website Tools
 apiName: Geographic Coordinate System Converter
 apiMethod: GET
@@ -24,7 +23,7 @@ featured: false
 
 # Geographic Coordinate System Converter API Integration Guide
 
-The Geographic Coordinate System Converter API from GuGuData converts longitude and latitude pairs between WGS84, GCJ02, and BD09 for map display, location normalization, and geospatial data workflows.
+The GuGuData Geographic Coordinate System Converter API normalizes longitude and latitude pairs across WGS84, GCJ-02, and BD-09. It supports every source and target combination and returns a consistent `[longitude, latitude]` array for map display, geocoding, navigation, delivery, and mobility products.
 
 
 
@@ -45,9 +44,9 @@ The Geographic Coordinate System Converter API from GuGuData converts longitude 
 
 ## When to use this API
 
-- Convert coordinates between common map coordinate systems.
-- Normalize geospatial data from different map providers.
-- Prepare location data before storage or display.
+- Align coordinates collected from international and China-focused map providers.
+- Prepare geocoding, navigation, delivery, fleet, and mobility data for display or storage.
+- Keep coordinate ordering and out-of-region behavior predictable across integrations.
 
 ## Request parameters
 

@@ -1,12 +1,11 @@
 ---
 title: Chinese Classical Poetry Database API Integration Guide
 description: >-
-  Learn how to integrate the Chinese Classical Poetry Database API with
-  documented request parameters, response fields, error handling, and practical
-  examples.
+  Search nearly 400,000 Tang poems, Song poems, and Song lyrics by title,
+  author, or content for education, research, and cultural products.
 slug: chinese-classical-poetry-database-api
 date: '2026-04-10'
-updated: '2026-08-24'
+updated: '2026-08-30'
 category: Data
 apiName: Chinese Classical Poetry Database
 apiMethod: GET
@@ -24,7 +23,7 @@ featured: false
 
 # Chinese Classical Poetry Database API Integration Guide
 
-The Chinese Classical Poetry Database API from GuGuData helps developers search Chinese classical poetry, including Tang poetry, Song poetry, and Song lyrics, with keyword and type filters.
+The GuGuData Chinese Classical Poetry Database API opens nearly 400,000 structured works to search by title, author, or content. It brings Tang poems, Song poems, and Song lyrics into one paginated interface for literature discovery, education, language learning, and cultural research.
 
 
 
@@ -45,9 +44,9 @@ The Chinese Classical Poetry Database API from GuGuData helps developers search 
 
 ## When to use this API
 
-- Search Chinese classical poetry by keyword and type.
-- Build education and cultural content tools.
-- Use poetry metadata in language learning applications.
+- Build poetry search and discovery experiences across major Tang and Song collections.
+- Add structured classical literature to education and language-learning products.
+- Support digital humanities, cultural research, and editorial content enrichment.
 
 ## Request parameters
 

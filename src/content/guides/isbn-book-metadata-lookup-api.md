@@ -1,11 +1,11 @@
 ---
 title: ISBN Book Metadata Lookup API Integration Guide
 description: >-
-  Learn how to integrate the ISBN Book Metadata Lookup API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Search books by ISBN or title and retrieve publishing metadata, authors,
+  translators, introductions, page counts, bindings, and cover images.
 slug: isbn-book-metadata-lookup-api
 date: '2026-04-17'
-updated: '2026-08-07'
+updated: '2026-08-30'
 category: Text
 apiName: ISBN Book Metadata Lookup
 apiMethod: GET
@@ -23,7 +23,7 @@ featured: false
 
 # ISBN Book Metadata Lookup API Integration Guide
 
-The ISBN Book Metadata Lookup API from GuGuData helps developers search book metadata by ISBN or title keywords and retrieve title, author, publisher, cover image, and publishing details.
+The GuGuData ISBN Book Metadata Lookup API searches by ISBN or title keywords and returns a structured book record. Available fields include the title, author, translator, publisher, publication date, page count, binding, book and author introductions, and cover image.
 
 
 
@@ -43,9 +43,9 @@ The ISBN Book Metadata Lookup API from GuGuData helps developers search book met
 
 ## When to use this API
 
-- Look up book metadata by ISBN for cataloging and bookstore workflows.
-- Search books by title keywords when an ISBN is unavailable.
-- Enrich publishing, library, education, and content management applications.
+- Populate bookstore, library, publishing, and education catalogs from an ISBN.
+- Discover books by title keywords when the exact identifier is unavailable.
+- Enrich product pages and reading lists with covers, introductions, and publishing details.
 
 ## Request parameters
 

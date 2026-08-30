@@ -5,7 +5,7 @@ description: >-
   link previews, directories, company profiles, and enrichment workflows.
 slug: get-any-site-title-and-favicon-api
 date: '2026-04-10'
-updated: '2026-08-25'
+updated: '2026-08-30'
 category: Website Tools
 apiName: Website Metadata and Favicon API
 apiMethod: GET

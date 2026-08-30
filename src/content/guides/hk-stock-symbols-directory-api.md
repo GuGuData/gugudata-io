@@ -5,7 +5,7 @@ description: >-
   and Chinese display names through a paginated JSON API.
 slug: hk-stock-symbols-directory-api
 date: '2026-04-10'
-updated: '2026-08-27'
+updated: '2026-08-30'
 category: Data
 apiName: HK Stock Symbols Directory
 apiMethod: GET

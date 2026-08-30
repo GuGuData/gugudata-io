@@ -5,7 +5,7 @@ description: >-
   and receive a downloadable HTTPS URL.
 slug: html-url-to-pdf-api
 date: '2026-04-10'
-updated: '2026-08-27'
+updated: '2026-08-30'
 category: Documents & Images
 apiName: HTML/URL to PDF
 apiMethod: POST
@@ -44,7 +44,7 @@ The GuGuData HTML/URL to PDF API converts either an HTML document or a public we
 - Generate invoices, receipts, statements, and reports from HTML templates.
 - Archive public web pages as fixed-layout PDF records.
 - Produce printable documents for review and approval workflows.
-- Create portrait or landscape exports without maintaining a browser runtime.
+- Create portrait or landscape exports for customer-facing and internal document workflows.
 
 ## Request body
 

@@ -5,7 +5,7 @@ description: >-
   archives, publishing, and business workflows.
 slug: convert-html-to-word-api
 date: '2026-04-17'
-updated: '2026-08-28'
+updated: '2026-08-30'
 category: Documents & Images
 apiName: Convert HTML to Word
 apiMethod: POST
@@ -23,7 +23,7 @@ featured: true
 
 # Convert HTML or Webpages to Word with an API
 
-Convert raw HTML or a publicly accessible webpage URL into an editable Word document. Use this API when a CMS, reporting tool, archive, or document workflow needs reliable DOCX output without running a conversion service.
+Convert raw HTML or a publicly accessible webpage URL into an editable Word document. Use this API when a CMS, reporting tool, archive, publishing workflow, or business application needs reliable DOCX output.
 
 
 

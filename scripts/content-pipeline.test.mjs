@@ -18,6 +18,24 @@ category: SEO
 Example body.
 `;
 
+const completedProductGuides = [
+  "article-extractor-api.md",
+  "general-barcode-generation-api.md",
+  "chinese-classical-poetry-database-api.md",
+  "isbn-book-metadata-lookup-api.md",
+  "pdf-ai-summary-api.md",
+  "geographic-coordinate-system-converter-api.md",
+  "domain-dns-information-query-api.md",
+  "get-any-site-title-and-favicon-api.md",
+  "article-content-extraction-api-seo-guide.md",
+  "extract-images-from-article-url-api-seo-guide.md",
+  "hk-stock-symbols-directory-api.md",
+  "html-url-to-pdf-api.md",
+  "convert-html-to-word-api.md",
+  "image-compression-api.md",
+  "image-ocr-extraction-api.md"
+];
+
 test("identical Finder copies collapse to one guide", () => {
   const guides = prepareSourceGuides(
     [
@@ -59,4 +77,33 @@ test("invalid source leaves existing output untouched", async () => {
     /missing required field/
   );
   assert.equal(await fs.readFile(path.join(outputRoot, "existing.md"), "utf8"), "keep me\n");
+});
+
+test("completed product guides use specific business-facing descriptions", async () => {
+  const guidesRoot = path.resolve("src/content/guides");
+  const forbiddenTerms = [
+    "Learn how to integrate",
+    "Apple ATS",
+    "load balancing",
+    "multi-node CDN",
+    "TLS v1.0",
+    "internal token",
+    "browser runtime",
+    "conversion service"
+  ];
+
+  for (const fileName of completedProductGuides) {
+    const content = await fs.readFile(path.join(guidesRoot, fileName), "utf8");
+    const frontmatter = content.match(/^---\n([\s\S]*?)\n---/)?.[1] || "";
+    const description = frontmatter.match(/description:\s*>-\n([\s\S]*?)(?=\n\w)/)?.[1]
+      .replace(/^\s+/gm, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    assert.ok(description?.length >= 90, `${fileName} needs a complete description`);
+    assert.match(frontmatter, /updated: ['"]2026-08-30['"]/);
+    for (const term of forbiddenTerms) {
+      assert.ok(!content.includes(term), `${fileName} exposes or uses weak copy: ${term}`);
+    }
+  }
 });

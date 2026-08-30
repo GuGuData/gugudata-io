@@ -1,11 +1,11 @@
 ---
 title: Article Extractor API Integration Guide
 description: >-
-  Learn how to integrate the Article Extractor API with documented request
-  parameters, response fields, error handling, and practical examples.
+  Extract article bodies, metadata, links, images, source, and reading time from
+  public URLs or raw HTML for research, monitoring, and content workflows.
 slug: article-extractor-api
 date: '2026-04-10'
-updated: '2026-08-23'
+updated: '2026-08-30'
 category: Website Tools
 apiName: Article Extractor
 apiMethod: POST
@@ -23,7 +23,7 @@ featured: false
 
 # Article Extractor API Integration Guide
 
-The Article Extractor API from GuGuData helps developers extract the primary article content, title, byline, publication date, and clean body text from a target webpage URL or a raw HTML document.
+The GuGuData Article Extractor API turns a public article URL or raw HTML document into a structured content record. It returns the readable article body alongside the title, description, author, publication date, source, links, images, favicon, article type, and estimated reading time.
 
 
 
@@ -45,9 +45,9 @@ The Article Extractor API from GuGuData helps developers extract the primary art
 
 ## When to use this API
 
-- Extract article title, author, and body content from target pages.
-- Build article ingestion workflows for research or monitoring.
-- Normalize web article content before analysis.
+- Build structured article feeds for research, monitoring, and competitive analysis.
+- Archive readable content together with its editorial metadata and source context.
+- Prepare web articles for search, classification, review, and downstream automation.
 
 ## Request parameters
 

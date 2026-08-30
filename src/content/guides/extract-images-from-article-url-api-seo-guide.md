@@ -1,11 +1,11 @@
 ---
 title: Extract Images from Article URL API Integration Guide
 description: >-
-  Learn how to integrate the Extract Images from Article URL API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Extract ordered article images, absolute URLs, alt text, and available
+  dimensions for SEO audits, media inventories, and content workflows.
 slug: extract-images-from-article-url-api-seo-guide
 date: '2026-07-08'
-updated: '2026-08-26'
+updated: '2026-08-30'
 category: SEO
 apiName: Extract Images from Article URL API
 apiMethod: POST
