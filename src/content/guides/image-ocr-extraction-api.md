@@ -1,11 +1,11 @@
 ---
 title: Image OCR Extraction API Integration Guide
 description: >-
-  Learn how to integrate the Image OCR Extraction API with documented request
-  parameters, response fields, error handling, and practical examples.
+  Extract English text from JPEG, PNG, WebP, TIFF, and BMP images with a
+  structured JSON response containing recognized lines and joined plain text.
 slug: image-ocr-extraction-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-08-30'
 category: Documents & Images
 apiName: Image OCR Extraction
 apiMethod: POST
@@ -14,48 +14,38 @@ detailUrl: 'https://gugudata.io/details/imagestreamocr'
 demoUrl: 'https://api.gugudata.io/v1/imagerecognition/ocr/demo'
 keywords:
   - Image OCR Extraction API
-  - GuGuData Image OCR Extraction
+  - image text extraction API
+  - English OCR JSON API
   - imagestreamocr API
-  - Document and Image APIs
-  - developer API documentation
 featured: false
 ---
 
 # Image OCR Extraction API Integration Guide
 
-The Image OCR Extraction API from GuGuData helps developers run OCR on an uploaded image stream and return the extracted text content.
+The Image OCR Extraction API recognizes English text in an uploaded image. It returns both non-empty text lines in reading order and the joined plain text, making the response suitable for document intake, search indexing, and automation.
 
-
-
-> Start here: [Try the live demo](https://api.gugudata.io/v1/imagerecognition/ocr/demo) or [view the current API details](https://gugudata.io/details/imagestreamocr).
+> Start here: [try the live demo](https://api.gugudata.io/v1/imagerecognition/ocr/demo) or [view the API details](https://gugudata.io/details/imagestreamocr).
 
 ## API details
 
 | Item | Value |
 | --- | --- |
-| API name | Image OCR Extraction |
-| Category | Document and Image APIs |
 | Method | `POST` |
 | Endpoint | `https://api.gugudata.io/v1/imagerecognition/ocr` |
 | Content type | `multipart/form-data` |
-| Demo endpoint | [https://api.gugudata.io/v1/imagerecognition/ocr/demo](https://api.gugudata.io/v1/imagerecognition/ocr/demo) |
-| Detail page | [https://gugudata.io/details/imagestreamocr](https://gugudata.io/details/imagestreamocr) |
-| OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
-
-## When to use this API
-
-- Extract text from uploaded screenshots and scanned images.
-- Build OCR ingestion for document workflows.
-- Convert image text into searchable content.
+| Supported images | JPEG, PNG, WebP, TIFF, BMP |
+| Maximum file size | 10 MiB |
+| Demo endpoint | [Run the OCR demo](https://api.gugudata.io/v1/imagerecognition/ocr/demo) |
+| OpenAPI | [OpenAPI 3.1 JSON](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
 
 ## Request parameters
 
-This endpoint accepts parameters through the query string plus request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+Send the application key in the query string and the image as a multipart file. Keep the key in trusted server-side code.
 
-| Parameter | Type | Required | Default | Description |
+| Parameter | Location | Type | Required | Description |
 | --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `imagefile` | `file` | Yes | - | Image file uploaded as multipart form data. |
+| `appkey` | Query | `string` | Yes | Application key used for authentication and access control. |
+| `imagefile` | Multipart body | `file` | Yes | JPEG, PNG, WebP, TIFF, or BMP image no larger than 10 MiB. |
 
 ## Example request
 
@@ -66,15 +56,16 @@ curl -X POST "https://api.gugudata.io/v1/imagerecognition/ocr?appkey=YOUR_APPKEY
 
 ## Response fields
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+| Field | Type | Description |
+| --- | --- | --- |
+| `dataStatus.statusCode` | `integer` | Application-level status code. |
+| `dataStatus.statusDescription` | `string` | Application-level status description. |
+| `dataStatus.responseDateTime` | `string` | Response time in ISO 8601 format. |
+| `dataStatus.dataTotalCount` | `integer` | Number of result objects in the response. |
+| `data.resultText` | `array<string>` | Recognized non-empty lines in reading order. |
+| `data.text` | `string` | Recognized content joined as plain text. |
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `DataStatus.statusCode` | `integer` | Yes | Application-level status code returned by the API response. |
-| `DataStatus.statusDescription` | `string` | Yes | Application-level status message returned by the API response. |
-| `DataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
-| `DataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `Data.resultText` | `array<string>` | Yes | Array of recognized text, each line of recognized text corresponds to each element of the array |
+An image with no recognized English text can still be processed successfully; in that case `resultText` is an empty array and `text` is an empty string.
 
 ## Response example
 
@@ -82,54 +73,61 @@ The response body contains the fields below for successful JSON responses. For b
 {
   "dataStatus": {
     "statusCode": 200,
-    "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
+    "statusDescription": "SUCCESS",
+    "responseDateTime": "2026-08-30T12:00:00Z",
     "dataTotalCount": 1
   },
-  "data": "sample value"
+  "data": {
+    "resultText": [
+      "CHAPTER I",
+      "AN OBSESSION WITH TIME"
+    ],
+    "text": "CHAPTER I\nAN OBSESSION WITH TIME"
+  }
 }
 ```
 
 ## HTTP status codes
 
-Use the HTTP status code for transport-level handling. If the response body contains `dataStatus.statusCode`, treat it as an application-level status field in the JSON payload.
-
 | HTTP status | Meaning | Recommended handling |
 | --- | --- | --- |
-| `200` | Request processed successfully. | Parse the documented response body for the endpoint result. |
-| `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
-| `401` | Missing or unknown application key. | Send a valid appkey with the request. |
-| `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
-| `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `200` | OCR completed, including a valid image with no recognized text. | Read `resultText` and `text`. |
+| `400` | The image is missing or the upload is malformed. | Check the multipart field and request format. |
+| `401` | The application key is missing or unknown. | Send a valid key as the `appkey` query parameter. |
+| `403` | The key does not have access to this API. | Check the product authorization. |
+| `413` | The image exceeds 10 MiB. | Resize or compress the source image. |
+| `415` | The file is not a supported image type. | Convert it to JPEG, PNG, WebP, TIFF, or BMP. |
+| `422` | The image cannot be decoded or exceeds processing dimensions. | Check the source image and reduce its dimensions. |
+| `429` | The request or usage limit was reached. | Retry after the applicable limit window. |
+| `502` | OCR processing did not complete in time. | Retry once with a smaller or clearer image. |
+| `503` | OCR is temporarily unavailable. | Retry later with bounded backoff. |
 
-## Implementation notes
+## Integration guidance
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+- Resize very large scans before upload to reduce latency and bandwidth.
+- Use clear, upright images with adequate contrast for better recognition quality.
+- Treat an empty successful result differently from an HTTP error.
+- Retry only temporary `502` or `503` responses, and keep retry counts bounded.
+- Use the demo for response-shape checks and the authenticated endpoint for production OCR.
 
 ## FAQ
 
-### Where is the official API detail page?
+### Does the API currently recognize multiple languages?
 
-The official detail page is [https://gugudata.io/details/imagestreamocr](https://gugudata.io/details/imagestreamocr). It is the best place to review the latest public endpoint information before publishing or integrating.
+The published OCR contract currently targets English text. Do not assume additional language support unless it is explicitly added to the API details and OpenAPI contract.
 
-### Should I handle `dataStatus.statusCode` as the HTTP status code?
+### Does the API return text positions or confidence scores?
 
-No. Use the HTTP status code for request-level behavior such as authentication, permission, rate limiting, and server errors. Use `dataStatus.statusCode` only as the response body status field when it is present.
+No. The response contains recognized lines and joined plain text. It does not currently expose bounding boxes or confidence scores.
 
 ### Can I use the demo endpoint in production?
 
-No. The demo endpoint is for quick testing and examples. Use the authenticated endpoint with your `appkey` for production workflows.
+No. The demo returns a stable sample for integration checks. Use the authenticated endpoint for your own images.
 
 ## Related GuGuData APIs
 
-- [HTML/URL to PDF](https://gugudata.io/details/html2pdf)
+- [Image Compression](https://gugudata.io/details/image-compress)
+- [Image OCR to Word](https://gugudata.io/details/ocr2word)
 - [PDF Parsing and Formatted Output](https://gugudata.io/details/pdf2format)
-- [PDF Splitting](https://gugudata.io/details/pdf-splitter)
 
 For more developer APIs, visit [GuGuData](https://gugudata.io/).

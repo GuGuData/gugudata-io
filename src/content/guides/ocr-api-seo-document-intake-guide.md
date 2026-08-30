@@ -5,7 +5,7 @@ description: >-
   response fields, error handling, and practical examples.
 slug: ocr-api-seo-document-intake-guide
 date: '2026-07-08'
-updated: '2026-08-07'
+updated: '2026-08-30'
 category: SEO
 apiName: OCR API
 apiMethod: POST
@@ -70,7 +70,7 @@ The API uses `multipart/form-data` because the source is a file upload.
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | `appkey` | `string` | Yes | Your GuGuData application key. Send it as a query parameter. |
-| `imagefile` | `file` | Yes | Image file uploaded as multipart form data. |
+| `imagefile` | `file` | Yes | JPEG, PNG, WebP, TIFF, or BMP image no larger than 10 MiB. |
 
 Example request:
 
@@ -83,8 +83,8 @@ curl -X POST "https://api.gugudata.io/v1/imagerecognition/ocr?appkey=YOUR_APPKEY
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `resultText` | `array<string>` | Recognized text lines. |
-| `text` | `string` | Full recognized text when available. |
+| `data.resultText` | `array<string>` | Recognized non-empty English text lines in reading order. |
+| `data.text` | `string` | Recognized English text joined as plain text. |
 
 Example response:
 
@@ -187,10 +187,14 @@ Use OCR API when you need text as data. Use OCR to Word when the user expects an
 | HTTP status | Meaning | Recommended handling |
 | --- | --- | --- |
 | `200` | Image text extracted. | Store `resultText` and `text`. |
-| `400` | Missing or invalid image file. | Validate file type, upload field name, and file size. |
+| `400` | Missing image or malformed upload. | Validate the multipart field and request format. |
 | `401` | Missing or unknown application key. | Check your `appkey`. |
 | `403` | Access or payment issue. | Check subscription and endpoint access. |
+| `413` | Image exceeds 10 MiB. | Resize or compress the image. |
+| `415` | Unsupported image type. | Convert it to JPEG, PNG, WebP, TIFF, or BMP. |
+| `422` | Image cannot be decoded or exceeds processing dimensions. | Check and reduce the source image. |
 | `429` | Rate limit reached. | Reduce concurrency or retry later. |
+| `502` | OCR processing did not complete in time. | Retry once with a smaller or clearer image. |
 | `503` | OCR service unavailable. | Retry later and keep the file in a recoverable queue. |
 
 ## FAQ
