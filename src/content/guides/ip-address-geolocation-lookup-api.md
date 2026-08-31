@@ -1,65 +1,62 @@
 ---
-title: IP Address Geolocation Lookup API Integration Guide
+title: IP Geolocation API Integration Guide
 description: >-
-  Learn how to integrate the IP Address Geolocation Lookup API with documented
-  request parameters, response fields, error handling, and practical examples.
+  Look up approximate country, region, city, latitude, and longitude for public
+  IPv4 and IPv6 addresses in analytics, log enrichment, and traffic workflows.
 slug: ip-address-geolocation-lookup-api
 date: '2026-04-10'
-updated: '2026-08-24'
+updated: '2026-08-31'
 category: Website Tools
-apiName: IP Address Geolocation Lookup
+apiName: IP Geolocation and Log Enrichment API
 apiMethod: GET
 apiEndpoint: /v1/location/ip
 detailUrl: 'https://gugudata.io/details/location-ip'
 demoUrl: 'https://api.gugudata.io/v1/location/ip/demo'
 keywords:
-  - IP Address Geolocation Lookup API
-  - GuGuData IP Address Geolocation Lookup
-  - location-ip API
-  - Website Tools APIs
-  - developer API documentation
+  - IP geolocation API
+  - IPv4 geolocation lookup
+  - IPv6 geolocation lookup
+  - IP log enrichment
+  - network traffic analytics
 featured: false
 ---
 
-# IP Address Geolocation Lookup API Integration Guide
+# IP Geolocation API Integration Guide
 
-The IP Address Geolocation Lookup API from GuGuData helps developers look up geolocation metadata for an IPv4 or IPv6 address.
+The GuGuData IP Geolocation API enriches a public IPv4 or IPv6 address with approximate country, region, city, latitude, and longitude fields. The response is suitable for application logs, traffic dashboards, operational review, product analytics, and location-aware reporting.
 
-Location data is based on the monthly DB-IP City Lite dataset and is approximate. [IP geolocation data by DB-IP](https://db-ip.com/).
+IP geolocation describes the network location associated with an address. It does not identify a person or provide a device's precise physical position. Location coverage and granularity vary by address.
 
+> Start with the [live demo](https://api.gugudata.io/v1/location/ip/demo) or review the [API details and pricing](https://gugudata.io/details/location-ip).
 
-
-> Start here: [Try the live demo](https://api.gugudata.io/v1/location/ip/demo) or [view the current API details](https://gugudata.io/details/location-ip).
-
-## API details
+## API overview
 
 | Item | Value |
 | --- | --- |
-| API name | IP Address Geolocation Lookup |
-| Category | Website Tools APIs |
 | Method | `GET` |
 | Endpoint | `https://api.gugudata.io/v1/location/ip` |
-| Content type | `query parameters` |
-| Demo endpoint | [https://api.gugudata.io/v1/location/ip/demo](https://api.gugudata.io/v1/location/ip/demo) |
-| Detail page | [https://gugudata.io/details/location-ip](https://gugudata.io/details/location-ip) |
-| OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
+| Demo | `https://api.gugudata.io/v1/location/ip/demo` |
+| Supported input | Public IPv4 and IPv6 addresses |
+| Main output | Country, region, city, latitude, and longitude |
 
-## When to use this API
+## Common use cases
 
-- Resolve IP address geolocation for analytics and security workflows.
-- Localize product experiences based on network location.
-- Enrich logs with country, region, and city metadata.
+- Add approximate location fields to access, authentication, support, and operational logs.
+- Segment traffic reports by country, region, or city when those fields are available.
+- Add geographic context to traffic review and anomaly triage.
+- Populate maps and dashboards with approximate network coordinates.
+- Normalize IPv4 and IPv6 enrichment through one response contract.
+
+Use geolocation as one contextual signal. Do not use it alone for identity verification, precise device tracking, or access decisions with significant user impact.
 
 ## Request parameters
 
-This endpoint accepts parameters through the query string. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `appkey` | `string` | Yes | GuGuData application key sent as a query parameter. Keep it on your server. |
+| `ip` | `string` | Yes | Public IPv4 or IPv6 address. Hostnames and non-public address ranges are not accepted. |
 
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `ip` | `string` | Yes | - | IP address to lookup (supports both IPv4 and IPv6, e.g., 8.8.8.8 or 2001:4878:b554:aaaa:aaaa:aaaa:aaaa:aaaa) |
-
-## Example request
+### IPv4 request
 
 ```bash
 curl -G "https://api.gugudata.io/v1/location/ip" \
@@ -67,87 +64,85 @@ curl -G "https://api.gugudata.io/v1/location/ip" \
   --data-urlencode "ip=8.8.8.8"
 ```
 
-## Response fields
+### IPv6 request
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+```bash
+curl -G "https://api.gugudata.io/v1/location/ip" \
+  --data-urlencode "appkey=YOUR_APPKEY" \
+  --data-urlencode "ip=2001:4860:4860::8888"
+```
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `dataStatus.requestParameter` | `string` | Yes | Normalized request parameters echoed by the service. Sensitive credentials are omitted when available. |
-| `dataStatus.statusCode` | `integer` | Yes | Application-level status code returned by the API response. |
-| `dataStatus.status` | `string` | Yes | Application-level status enum returned by the API response. |
-| `dataStatus.statusDescription` | `string` | Yes | Application-level status message returned by the API response. |
-| `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
-| `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `data.countryCode` | `string` | No | ISO country code (e.g., US, CN, GB) |
-| `data.state` | `string` | No | State or province name |
-| `data.city` | `string` | No | City name |
-| `data.latitude` | `number` | No | Geographic latitude coordinate |
-| `data.longitude` | `number` | No | Geographic longitude coordinate |
+Private, loopback, link-local, reserved, multicast, unspecified, and hostname inputs return `400` without a location lookup.
 
-## Response example
+## Successful response
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "ip=8.8.*.*",
     "statusCode": 200,
-    "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
-    "dataTotalCount": 1,
     "status": "SUCCESS",
-    "requestParameter": ""
+    "statusDescription": "successfully",
+    "responseDateTime": "2026-08-31 13:22:04+0000",
+    "dataTotalCount": 1
   },
   "data": {
-    "countryCode": "sample value",
-    "state": "sample value",
-    "city": "sample value",
-    "latitude": "sample value",
-    "longitude": "sample value"
+    "countryCode": "US",
+    "state": "California",
+    "city": "Mountain View",
+    "latitude": 37.386,
+    "longitude": -122.0838
   }
 }
 ```
 
-## HTTP status codes
+The authenticated response masks part of the address in `requestParameter`. The Demo uses the public fixture `8.8.8.8` and shows that complete fixture value so the sample is reproducible.
 
-Use the HTTP status code for transport-level handling. If the response body contains `dataStatus.statusCode`, treat it as an application-level status field in the JSON payload.
+## Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data.countryCode` | `string \| null` | ISO 3166-1 alpha-2 country code when available. |
+| `data.state` | `string \| null` | English first-level administrative area name when available. |
+| `data.city` | `string \| null` | English city name when available. |
+| `data.latitude` | `number \| null` | Approximate latitude when available. |
+| `data.longitude` | `number \| null` | Approximate longitude when available. |
+
+## Valid address without coverage
+
+A syntactically valid public address may not have a location record in the current dataset. This is a successful lookup, not an input error. In that case, all five fields in `data` are `null` and `dataStatus.statusCode` remains `200`.
+
+Applications should treat every location field as nullable and keep the original workflow usable when city-level coverage is unavailable.
+
+## HTTP status handling
 
 | HTTP status | Meaning | Recommended handling |
 | --- | --- | --- |
-| `200` | Request processed successfully. | Parse the documented response body for the endpoint result. |
-| `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
-| `401` | Missing or unknown application key. | Send a valid appkey with the request. |
-| `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
-| `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+| `200` | The public address was evaluated. Location fields may be null. | Parse nullable fields and continue the workflow. |
+| `400` | The value is missing, malformed, a hostname, or not a public address. | Validate the input before retrying. |
+| `401` | The application key is missing or unknown. | Check the server-side `appkey`. |
+| `403` | The key does not have access to the product. | Check the subscription and authorization. |
+| `429` | The request rate is over the allowed limit. | Reduce concurrency and retry later. |
+| `500` | An unexpected API error occurred. | Retry conservatively and contact support if persistent. |
+| `503` | IP location data is temporarily unavailable. | Retry later without changing the address. |
 
-## Implementation notes
+## Integration guidance
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
-- Treat city and coordinate results as approximate network-location signals rather than precise device locations.
+- Validate that the value is an IP address rather than a hostname before calling the API.
+- Keep `appkey` in a trusted server environment, not browser-side code.
+- Cache stable lookup results when your data-retention policy allows it.
+- Preserve null values instead of substituting invented city or coordinate data.
+- Store the lookup time when location freshness matters to your reporting workflow.
+- Combine IP location with other application signals rather than treating it as proof of identity.
 
-## FAQ
+## Data attribution and accuracy
 
-### Where is the official API detail page?
-
-The official detail page is [https://gugudata.io/details/location-ip](https://gugudata.io/details/location-ip). It is the best place to review the latest public endpoint information before publishing or integrating.
-
-### Should I handle `dataStatus.statusCode` as the HTTP status code?
-
-No. Use the HTTP status code for request-level behavior such as authentication, permission, rate limiting, and server errors. Use `dataStatus.statusCode` only as the response body status field when it is present.
-
-### Can I use the demo endpoint in production?
-
-No. The demo endpoint is for quick testing and examples. Use the authenticated endpoint with your `appkey` for production workflows.
+Location data is based on the monthly DB-IP City Lite dataset and is approximate. See [IP geolocation data by DB-IP](https://db-ip.com/) for dataset information. Country results are generally broader than city and coordinate results, and mobile or routed networks may resolve far from the end user.
 
 ## Related GuGuData APIs
 
-- [Webpage Readable Content Extraction](https://gugudata.io/details/readability)
-- [Domain SSL Certificate Information Parsing](https://gugudata.io/details/sslcertinfo)
-- [Domain DNS Information Query](https://gugudata.io/details/dnslookup)
+- [DNS Lookup API](https://gugudata.io/details/dnslookup) for structured domain records.
+- [Website Metadata and Favicon API](https://gugudata.io/details/favicon) for link-preview metadata.
+- [Geographic Coordinate System Converter](https://gugudata.io/details/coordinateconverter) for WGS84, GCJ-02, and BD-09 conversion.
 
-For more developer APIs, visit [GuGuData](https://gugudata.io/).
+Browse the complete API catalog at [GuGuData](https://gugudata.io/).
