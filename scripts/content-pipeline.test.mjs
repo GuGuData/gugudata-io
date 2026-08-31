@@ -18,23 +18,24 @@ category: SEO
 Example body.
 `;
 
-const completedProductGuides = [
-  "article-extractor-api.md",
-  "general-barcode-generation-api.md",
-  "chinese-classical-poetry-database-api.md",
-  "isbn-book-metadata-lookup-api.md",
-  "pdf-ai-summary-api.md",
-  "geographic-coordinate-system-converter-api.md",
-  "domain-dns-information-query-api.md",
-  "get-any-site-title-and-favicon-api.md",
-  "article-content-extraction-api-seo-guide.md",
-  "extract-images-from-article-url-api-seo-guide.md",
-  "hk-stock-symbols-directory-api.md",
-  "html-url-to-pdf-api.md",
-  "convert-html-to-word-api.md",
-  "image-compression-api.md",
-  "image-ocr-extraction-api.md"
-];
+const completedProductGuides = {
+  "article-extractor-api.md": "2026-08-30",
+  "general-barcode-generation-api.md": "2026-08-30",
+  "chinese-classical-poetry-database-api.md": "2026-08-30",
+  "isbn-book-metadata-lookup-api.md": "2026-08-30",
+  "pdf-ai-summary-api.md": "2026-08-30",
+  "geographic-coordinate-system-converter-api.md": "2026-08-30",
+  "domain-dns-information-query-api.md": "2026-08-30",
+  "get-any-site-title-and-favicon-api.md": "2026-08-30",
+  "article-content-extraction-api-seo-guide.md": "2026-08-30",
+  "extract-images-from-article-url-api-seo-guide.md": "2026-08-30",
+  "hk-stock-symbols-directory-api.md": "2026-08-30",
+  "html-url-to-pdf-api.md": "2026-08-30",
+  "convert-html-to-word-api.md": "2026-08-30",
+  "image-compression-api.md": "2026-08-30",
+  "image-ocr-extraction-api.md": "2026-08-30",
+  "international-phone-number-validation-and-correction-api.md": "2026-08-31"
+};
 
 test("identical Finder copies collapse to one guide", () => {
   const guides = prepareSourceGuides(
@@ -92,7 +93,7 @@ test("completed product guides use specific business-facing descriptions", async
     "conversion service"
   ];
 
-  for (const fileName of completedProductGuides) {
+  for (const [fileName, expectedDate] of Object.entries(completedProductGuides)) {
     const content = await fs.readFile(path.join(guidesRoot, fileName), "utf8");
     const frontmatter = content.match(/^---\n([\s\S]*?)\n---/)?.[1] || "";
     const description = frontmatter.match(/description:\s*>-\n([\s\S]*?)(?=\n\w)/)?.[1]
@@ -101,7 +102,7 @@ test("completed product guides use specific business-facing descriptions", async
       .trim();
 
     assert.ok(description?.length >= 90, `${fileName} needs a complete description`);
-    assert.match(frontmatter, /updated: ['"]2026-08-30['"]/);
+    assert.match(frontmatter, new RegExp(`updated: ['"]${expectedDate}['"]`));
     for (const term of forbiddenTerms) {
       assert.ok(!content.includes(term), `${fileName} exposes or uses weak copy: ${term}`);
     }
