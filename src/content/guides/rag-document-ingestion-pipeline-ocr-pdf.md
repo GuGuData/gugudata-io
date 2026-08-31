@@ -3,7 +3,7 @@ title: "Build a RAG Document Ingestion Pipeline with OCR and PDF APIs"
 description: "Build a traceable RAG document ingestion pipeline that converts images and PDFs into normalized text, metadata, searchable chunks, and cited answers."
 slug: "rag-document-ingestion-pipeline-ocr-pdf"
 date: "2026-08-20"
-updated: "2026-08-20"
+updated: "2026-08-31"
 category: "AI & RAG"
 keywords:
   - "RAG document ingestion pipeline"
@@ -111,12 +111,12 @@ GuGuData also exposes a knowledge-base document endpoint:
 POST /ai/knowledge-bases/{knowledge_base_id}/documents
 ```
 
-The request uses multipart form data, an `appkey` query parameter, and one or more `files[]` values. The current OpenAPI contract documents up to five files per request and up to 20 MB per file. Optional fields include `tenant_id`, `metadata`, and `replace_existing`.
+The request uses multipart form data, an `appkey` query parameter, and one or more repeated `files` fields. The current OpenAPI contract documents up to five files per request and up to 20 MB per file. Optional fields include `tenant_id`, `metadata`, and `replace_existing`.
 
 ```bash
 curl -X POST \
   "https://api.gugudata.io/ai/knowledge-bases/KNOWLEDGE_BASE_ID/documents?appkey=YOUR_APPKEY" \
-  -F "files[]=@./approved-report.pdf" \
+  -F "files=@./approved-report.pdf" \
   -F 'metadata={"source":"research-library","language":"en"}' \
   -F "replace_existing=false"
 ```
