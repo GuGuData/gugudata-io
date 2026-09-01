@@ -1,12 +1,12 @@
 ---
 title: Image OCR to Word API Integration Guide
 description: >-
-  Learn how to integrate the Image OCR to Word API with documented request
-  parameters, response fields, error handling, and practical examples.
+  Convert English text in JPEG, PNG, WebP, TIFF, or BMP images into editable
+  Word documents for review, document intake, and archive workflows.
 slug: image-ocr-to-word-api-guide
 date: '2026-07-08'
-updated: '2026-08-07'
-category: SEO
+updated: '2026-09-01'
+category: Document Processing
 apiName: Image OCR to Word API
 apiMethod: POST
 apiEndpoint: 'https://api.gugudata.io/v1/imagerecognition/ocr2word'
@@ -15,8 +15,8 @@ demoUrl: 'https://gugudata.io/demo/ocr2word'
 cover_image: 'https://cdn.gugudata.io/api-covers/api-covers_ocr2word.png'
 canonical_url: 'https://gugudata.io/details/ocr2word'
 tags:
-  - seo
-  - webdev
+  - ocr
+  - document-processing
   - api
   - automation
 keywords:
@@ -30,186 +30,99 @@ featured: false
 
 # Image OCR to Word API Integration Guide
 
-Screenshots, scanned notes, receipts, forms, and image-based documents often contain text that needs human review. Plain OCR text is useful for indexing, but an editable Word document is often easier for business teams to revise, comment on, and hand off.
+The [GuGuData Image OCR to Word API](https://gugudata.io/details/ocr2word) recognizes English text in an uploaded image and generates an editable `.docx` document. It helps teams turn screenshots, photographed notes, receipts, forms, and scanned pages into drafts that can be reviewed, corrected, commented on, and shared.
 
-The [GuGuData Image OCR to Word API](https://gugudata.io/details/ocr2word) runs OCR on an uploaded image file and generates a downloadable Word document containing the recognized text. It is useful for document intake, content cleanup, archive review, and SEO-supporting workflows where image text should become editable content.
-
-This guide explains how to call the API and how to use it responsibly in content operations.
-
-
-> Start here: [Try the live demo](https://gugudata.io/demo/ocr2word) or [view the current API details](https://gugudata.io/details/ocr2word).
-
-## Why convert image OCR to Word?
-
-Image OCR gives you recognized text. Word output gives you a working document that people can edit.
-
-That distinction matters in workflows such as:
-
-- Converting screenshot notes into editable drafts.
-- Reviewing scanned forms or labels.
-- Preparing image-based source material for web publication.
-- Cleaning up old scanned content before migration.
-- Creating editable records from field photos.
-- Routing OCR output to non-technical reviewers.
-
-For SEO teams, this is useful when source material exists only as images but needs to become searchable, accessible, and publishable content.
+Use the [live demo](https://gugudata.io/demo/ocr2word) to inspect a generated document before integrating the paid endpoint. The demo uses this reproducible [public image fixture](https://cdn.gugudata.io/api-fixtures/image-ocr-demo.png).
 
 ## API overview
 
 | Item | Value |
 | --- | --- |
-| API name | Image OCR to Word API |
 | Method | `POST` |
 | Endpoint | `https://api.gugudata.io/v1/imagerecognition/ocr2word` |
-| Detail page | [https://gugudata.io/details/ocr2word](https://gugudata.io/details/ocr2word) |
-| Demo page | [https://gugudata.io/demo/ocr2word](https://gugudata.io/demo/ocr2word) |
-| Main use case | Generate a downloadable Word document from image OCR output |
-
-The endpoint uses `multipart/form-data` because the source is an uploaded image file.
+| Content type | `multipart/form-data` |
+| Supported images | JPEG, PNG, WebP, TIFF, BMP |
+| Maximum upload | 10 MiB |
+| Maximum dimensions | 8,192 pixels per side and 40 million pixels total |
+| OCR language | English |
+| Output | Downloadable Word `.docx` URL |
 
 ## Request parameters
 
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Your GuGuData application key. |
-| `imagefile` | `file` | Yes | None | Image file uploaded as multipart form data. |
-| `filename` | `string` | No | `result.docx` | Optional output Word file name. |
-
-Example request:
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `appkey` | `string` | Yes | Application key passed in the query string. |
+| `imagefile` | `file` | Yes | Supported image uploaded as multipart form data. |
+| `filename` | `string` | No | Safe output name up to 128 characters. The `.docx` extension is added when omitted and whitespace becomes hyphens. |
 
 ```bash
 curl -X POST "https://api.gugudata.io/v1/imagerecognition/ocr2word?appkey=YOUR_APPKEY" \
-  -F "imagefile=@./scan.png" \
-  -F "filename=scan-notes.docx"
+  -F "imagefile=@./receipt.png" \
+  -F "filename=receipt-notes.docx"
 ```
 
-## Response fields
+Keep the AppKey in a trusted backend environment. Do not expose it in browser or mobile application source code.
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `wordPath` | `string` | Download URL of the generated Word document. |
+## Success response
 
-Example response:
+The API keeps the existing response contract and returns one HTTPS document URL:
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "image_bytes=84644&content_type=image/png&output_filename=receipt-notes.docx",
     "statusCode": 200,
     "status": "SUCCESS",
     "statusDescription": "successfully",
+    "responseDateTime": "2026-09-01 08:00:00+0000",
     "dataTotalCount": 1
   },
   "data": {
-    "wordPath": "https://cdn.gugudata.io/outputs/scan-notes.docx"
+    "wordPath": "https://storage.gugudata.io/ocr2word/55a4346b-receipt-notes.docx"
   }
 }
 ```
 
-## SEO-supporting workflows
+| Field | Type | Description |
+| --- | --- | --- |
+| `dataStatus.requestParameter` | `string` | Redacted upload size, media type, and normalized output filename. |
+| `dataStatus.statusCode` | `integer` | Application-level result code. |
+| `dataStatus.dataTotalCount` | `integer` | `1` when a document is generated. |
+| `data.wordPath` | `string` | Public HTTPS URL of the generated Word document. |
 
-### 1. Convert image-only source material into editable drafts
+Download or copy the generated document into storage controlled by your application when long-term retention is required.
 
-Content teams often receive source material as screenshots or scans. Before that material can become an article, documentation page, or landing page section, someone needs an editable text draft.
+## Recommended workflows
 
-Image OCR to Word can help:
+- Convert photographed notes into editable meeting or research drafts.
+- Send receipt, form, and label text to a human review queue.
+- Create editable archive records from scanned image files.
+- Give operations teams a familiar Word document instead of raw OCR JSON.
+- Process incoming images from a backend queue while preserving the original image for visual verification.
 
-1. Upload the image file.
-2. Generate a Word document.
-3. Send the file to an editor for cleanup.
-4. Convert the approved content into HTML.
-5. Publish accessible text on the target page.
+OCR output can contain recognition errors, especially when images are blurred, rotated, low contrast, or use decorative fonts. Review business-critical text before publishing or using it for automated decisions.
 
-This reduces manual retyping while keeping human review in the loop.
-
-### 2. Turn screenshot research into reusable notes
-
-SEO work often includes screenshots from search results, competitor pages, dashboards, and reports. A Word document can be easier to annotate than plain text.
-
-Use this workflow when:
-
-- A researcher wants to comment on screenshot text.
-- A report needs editable extracted text.
-- A team needs to turn image evidence into a written brief.
-- A screenshot contains structured text that should be cleaned manually.
-
-For purely searchable storage, use [OCR API](https://gugudata.io/details/ocr). For human editing, use Image OCR to Word API.
-
-### 3. Support accessibility cleanup
-
-If important website information exists only in an image, OCR to Word can create an editable draft for conversion into accessible HTML text. This supports both users and SEO because important content becomes easier to read, search, and maintain.
-
-Examples:
-
-- Event schedules embedded as images.
-- Product comparison tables saved as screenshots.
-- Menu images.
-- Scanned instructions.
-- Promotional banners with dense text.
-
-The OCR Word file should be treated as a draft source, then rewritten and structured for the web.
-
-### 4. Build a review queue for uploaded images
-
-In a product workflow, users may upload images that contain text. Generate a Word document only for images selected for editing. Store the returned `wordPath` with the original image and review status.
-
-Useful status fields:
-
-- Uploaded
-- OCR completed
-- Word generated
-- Needs review
-- Approved
-- Published
-- Archived
-
-This keeps document operations traceable.
-
-## Implementation notes
-
-- Validate image type before upload.
-- Keep file upload and `appkey` handling on your backend.
-- Use `filename` to provide human-readable document names.
-- Store `wordPath` with the original image record.
-- Treat OCR output as a draft. Review important content before publishing.
-- Add retry handling for temporary failures.
-- Use a queue for batch image processing.
-- Keep original images when visual evidence matters.
-
-## HTTP status handling
+## Error handling
 
 | HTTP status | Meaning | Recommended handling |
 | --- | --- | --- |
-| `200` | Word document generated. | Store `wordPath` and connect it to the source image record. |
-| `400` | Missing or invalid image file. | Validate upload field name, file type, and file size. |
-| `401` | Missing or unknown application key. | Check your `appkey`. |
-| `403` | Access or payment issue. | Check subscription and endpoint access. |
-| `429` | Rate limit reached. | Reduce concurrency or retry later. |
-| `503` | OCR service unavailable. | Retry later and keep the conversion job recoverable. |
+| `400` | Missing image or invalid output filename. | Check multipart field names and filename characters. |
+| `401` | Missing or unknown AppKey. | Send a valid server-side AppKey. |
+| `403` | The AppKey is not authorized for this product. | Check subscription and authorization status. |
+| `413` | Image exceeds 10 MiB. | Resize or compress the source image. |
+| `415` | File is not JPEG, PNG, WebP, TIFF, or BMP. | Convert the source to a supported image format. |
+| `422` | Image is invalid, too large in dimensions, or contains no readable text. | Inspect image quality and pixel dimensions. |
+| `429` | Request rate limit reached. | Reduce concurrency and retry after the limit window. |
+| `502` | OCR processing did not finish or returned an invalid document result. | Retry later and avoid creating duplicate review jobs. |
+| `503` | Conversion capability is temporarily unavailable. | Keep the source image and retry later. |
 
-## FAQ
+## Image OCR API or Image OCR to Word API?
 
-### How is this different from OCR API?
+Use the [Image OCR API](https://gugudata.io/details/ocr) when an application needs recognized text as JSON. Use Image OCR to Word when people need an editable document for review, correction, comments, or handoff.
 
-[OCR API](https://gugudata.io/details/ocr) returns recognized text as data. Image OCR to Word API returns a downloadable Word document for editing and review.
+Related document APIs:
 
-### Is this for public SEO pages?
-
-It supports the content workflow. The final public SEO content should usually be published as accessible HTML, not only as a Word file.
-
-### Can I choose the output file name?
-
-Yes. Use the optional `filename` parameter to specify the generated `.docx` file name.
-
-### Should I automatically publish OCR output?
-
-No. OCR output should be reviewed before publication, especially when the source image is low quality or the content is business-critical.
-
-## Related GuGuData APIs
-
-- [OCR API](https://gugudata.io/details/ocr): extract recognized text from uploaded image files.
-- [PDF OCR to Text API](https://gugudata.io/details/pdf2text): extract page-level and combined recognized text from PDFs.
-- [PDF OCR to Word API](https://gugudata.io/details/pdf2word): generate editable Word documents from PDF OCR output.
-- [HTML to Word](https://gugudata.io/details/html2word): convert HTML content into a Word document.
-- [Convert Word to HTML](https://gugudata.io/details/word2html): turn Word documents into web-friendly HTML.
-
-For more OCR, document, and SEO-supporting APIs, visit [GuGuData](https://gugudata.io/).
+- [PDF OCR to Text API](https://gugudata.io/details/pdf2text)
+- [PDF OCR to Word API](https://gugudata.io/details/pdf2word)
+- [HTML to Word API](https://gugudata.io/details/html2word)
+- [Word to HTML API](https://gugudata.io/details/word2html)
