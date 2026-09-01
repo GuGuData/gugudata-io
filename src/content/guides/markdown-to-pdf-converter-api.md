@@ -75,7 +75,7 @@ The API returns a JSON envelope containing a public HTTPS URL for the generated 
 ```json
 {
   "dataStatus": {
-    "requestParameter": "content_length=144,content_bytes=144",
+    "requestParameter": "content_length=133,content_bytes=133",
     "statusCode": 200,
     "statusDescription": "successfully",
     "responseDateTime": "2026-09-01T10:30:00+08:00",
