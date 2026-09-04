@@ -1,11 +1,9 @@
 ---
-title: PDF Splitting API Integration Guide
-description: >-
-  Learn how to integrate the PDF Splitting API with documented request
-  parameters, response fields, error handling, and practical examples.
+title: PDF Splitting API Guide
+description: Split PDFs by page count, package results as a ZIP, or keep generated files private.
 slug: pdf-splitting-api
 date: '2026-04-10'
-updated: '2026-08-07'
+updated: '2026-09-04'
 category: Documents & Images
 apiName: PDF Splitting
 apiMethod: POST
@@ -13,135 +11,129 @@ apiEndpoint: /v1/imagerecognition/pdf-splitter
 detailUrl: 'https://gugudata.io/details/pdf-splitter'
 demoUrl: 'https://api.gugudata.io/v1/imagerecognition/pdf-splitter/demo'
 keywords:
-  - PDF Splitting API
-  - GuGuData PDF Splitting
-  - pdf-splitter API
-  - Document and Image APIs
-  - developer API documentation
+  - PDF splitting API
+  - split PDF by pages
+  - private PDF download
+  - PDF ZIP API
 featured: false
 ---
 
-# PDF Splitting API Integration Guide
+# PDF Splitting API Guide
 
-The PDF Splitting API from GuGuData helps developers split an uploaded PDF into smaller documents based on the requested page size and packaging options.
+Split a PDF into predictable page ranges for document review, downstream uploads, customer delivery, or automated archives. Results can be returned as individual PDFs, packaged into a ZIP, or stored privately for short-lived downloads.
 
+> [Try the demo](https://api.gugudata.io/v1/imagerecognition/pdf-splitter/demo) or [view API details](https://gugudata.io/details/pdf-splitter).
 
+## Endpoint
 
-> Start here: [Try the live demo](https://api.gugudata.io/v1/imagerecognition/pdf-splitter/demo) or [view the current API details](https://gugudata.io/details/pdf-splitter).
+`POST https://api.gugudata.io/v1/imagerecognition/pdf-splitter`
 
-## API details
+Send the AppKey as the `appkey` query parameter. The request body uses `multipart/form-data` and accepts exactly one input source.
 
-| Item | Value |
-| --- | --- |
-| API name | PDF Splitting |
-| Category | Document and Image APIs |
-| Method | `POST` |
-| Endpoint | `https://api.gugudata.io/v1/imagerecognition/pdf-splitter` |
-| Content type | `multipart/form-data` |
-| Demo endpoint | [https://api.gugudata.io/v1/imagerecognition/pdf-splitter/demo](https://api.gugudata.io/v1/imagerecognition/pdf-splitter/demo) |
-| Detail page | [https://gugudata.io/details/pdf-splitter](https://gugudata.io/details/pdf-splitter) |
-| OpenAPI JSON | [https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json](https://gugudata.io/assets/openapi/gugudata.openapi.3.1.json) |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `file` | file | - | A PDF upload up to 20 MiB and 100 pages. |
+| `file_url` | URL | - | A public HTTP or HTTPS PDF URL, up to 2048 characters. |
+| `page_size` | integer | `100` | Pages per output file, from 1 to 100. |
+| `is_zip` | boolean | `true` | Package all split files in one ZIP. |
+| `storage` | string | `public` | Use `public` for download URLs or `private` for protected file references. |
 
-## When to use this API
-
-- Split long PDFs into smaller review packages.
-- Prepare upload-sized document chunks for downstream systems.
-- Automate PDF packaging by page count.
-
-## Request parameters
-
-This endpoint accepts parameters through the query string plus request body. Keep `appkey` out of client-side public code and send it only from trusted server-side environments.
-
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Application key used for request authentication. Supply the value as a query parameter, form field, or multipart field according to the request content type. |
-| `page_size` | `integer` | Yes | - | Number of pages per split output file. |
-| `is_zip` | `boolean` | Yes | `false` | Whether the split PDF output should be packaged as a ZIP archive. |
-| `file` | `file` | Yes | - | Local file uploaded as multipart form data. |
-
-## Example request
+## Upload a PDF
 
 ```bash
 curl -X POST "https://api.gugudata.io/v1/imagerecognition/pdf-splitter?appkey=YOUR_APPKEY" \
-  -F "page_size=5" \
-  -F "is_zip=false" \
-  -F "file=@./sample.pdf"
+  -F "file=@./report.pdf" \
+  -F "page_size=10" \
+  -F "is_zip=false"
 ```
 
-## Response fields
+## Split a PDF from a URL
 
-The response body contains the fields below for successful JSON responses. For binary endpoints, the success response is returned as binary content and JSON is used for error responses.
+URL input is convenient for Remote MCP and server-to-server workflows.
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `dataStatus.statusCode` | `integer` | Yes | Application-level status code returned by the API response. |
-| `dataStatus.status` | `string` | Yes | Application-level status enum returned by the API response. |
-| `dataStatus.statusDescription` | `string` | Yes | Application-level status message returned by the API response. |
-| `dataStatus.responseDateTime` | `string` | Yes | Response timestamp returned by the API response. |
-| `dataStatus.dataTotalCount` | `integer` | Yes | Total number of records that match the request. |
-| `data.uuid` | `string` | Yes | Unique identifier for the split operation |
-| `data.num_files` | `integer` | Yes | Number of files generated after splitting |
-| `data.pdf_files` | `array<string>` | Yes | Array of URLs to download the split PDF files or ZIP archive |
+```bash
+curl -X POST "https://api.gugudata.io/v1/imagerecognition/pdf-splitter?appkey=YOUR_APPKEY" \
+  -F "file_url=https://storage.gugudata.io/pdf/demo.pdf" \
+  -F "page_size=2" \
+  -F "is_zip=true"
+```
 
-## Response example
+## Public output
+
+Public mode preserves the original response fields. `pdf_files` contains HTTPS URLs for the generated PDFs or ZIP.
 
 ```json
 {
   "dataStatus": {
     "statusCode": 200,
+    "status": "SUCCESS",
     "statusDescription": "successfully",
-    "responseDateTime": "2026-04-10T00:00:00Z",
-    "dataTotalCount": 1,
-    "status": "SUCCESS"
+    "responseDateTime": "2026-09-04T12:00:00Z",
+    "dataTotalCount": 1
   },
   "data": {
-    "uuid": "sample value",
-    "num_files": "sample value",
-    "pdf_files": "sample value"
+    "uuid": "8c90a913-7012-447e-a088-041f9652e924",
+    "num_files": 2,
+    "pdf_files": [
+      "https://storage.gugudata.io/pdf-splitter/8c90a913/part-001.pdf",
+      "https://storage.gugudata.io/pdf-splitter/8c90a913/part-002.pdf"
+    ]
   }
 }
 ```
 
-## HTTP status codes
+## Private output
 
-Use the HTTP status code for transport-level handling. If the response body contains `dataStatus.statusCode`, treat it as an application-level status field in the JSON payload.
+Set `storage=private` when generated documents should not have public URLs. The response returns file references and an empty `pdf_files` array. Create an account download key in Dashboard Security, then exchange a `file_id` for a temporary URL.
 
-| HTTP status | Meaning | Recommended handling |
-| --- | --- | --- |
-| `200` | Request processed successfully. | Parse the documented response body for the endpoint result. |
-| `400` | Invalid request parameters or request format. | Check required fields, data types, and request body format. |
-| `401` | Missing or unknown application key. | Send a valid appkey with the request. |
-| `403` | The application key is recognized but access is not allowed. | Check subscription, trial state, and endpoint access. |
-| `429` | Request rate or trial usage limit exceeded. | Reduce concurrency or retry after the limit window resets. |
-| `500` | Internal service error. | Retry later or contact support if the error persists. |
-| `503` | Upstream service unavailable. | Retry later when the dependency is available again. |
+```json
+{
+  "data": {
+    "uuid": "8c90a913-7012-447e-a088-041f9652e924",
+    "num_files": 1,
+    "pdf_files": [],
+    "storage": "private",
+    "files": [
+      {
+        "file_id": "6718ae9a-acde-4ed9-8508-6bd80a923ead",
+        "file_name": "split-pdf.zip",
+        "content_type": "application/zip",
+        "size_bytes": 18432,
+        "index": 1
+      }
+    ]
+  }
+}
+```
 
-## Implementation notes
+Use the returned `files[].file_id` in the signing path:
 
-- Validate required parameters before sending the request so `400` responses are easier to diagnose.
-- Keep server-side retries conservative for `429`, `500`, and `503` responses.
-- Cache stable metadata responses when your use case allows it, especially for lookup and directory endpoints.
-- Log the HTTP status code and `dataStatus.statusDescription` together for easier debugging.
-- Use the demo endpoint for a quick connectivity check, then switch to the authenticated endpoint for production data.
+```bash
+curl -X POST "https://api.gugudata.io/v1/private-files/FILE_ID:sign?appkey=YOUR_APPKEY" \
+  -H "Content-Type: application/json" \
+  -d '{"secret":"YOUR_PRIVATE_DOWNLOAD_KEY","expires_seconds":600}'
+```
 
-## FAQ
+The signing response includes `file_id`, `url`, and `expires_at`. The URL expires after 10 minutes by default; accepted values range from 1 to 3600 seconds. Private output files are retained for seven days.
 
-### Where is the official API detail page?
+## Validation and errors
 
-The official detail page is [https://gugudata.io/details/pdf-splitter](https://gugudata.io/details/pdf-splitter). It is the best place to review the latest public endpoint information before publishing or integrating.
+| HTTP status | Meaning |
+| --- | --- |
+| `400` | Input source, page size, storage mode, or request format is invalid. |
+| `401` | AppKey is missing or unknown. |
+| `403` | The account cannot access the API or private file. |
+| `404` | The private file is unavailable to the current account. |
+| `413` | The PDF exceeds the file-size or page-count limit. |
+| `422` | The file is damaged, encrypted, or not a valid PDF. |
+| `429` | Request limit exceeded. |
+| `502` | A remote PDF could not be fetched. |
+| `503` | PDF splitting or file storage is temporarily unavailable. |
 
-### Should I handle `dataStatus.statusCode` as the HTTP status code?
+Do not log PDF content, AppKeys, private download keys, or signed URLs. Save public results promptly and request private links only when a user is ready to download.
 
-No. Use the HTTP status code for request-level behavior such as authentication, permission, rate limiting, and server errors. Use `dataStatus.statusCode` only as the response body status field when it is present.
-
-### Can I use the demo endpoint in production?
-
-No. The demo endpoint is for quick testing and examples. Use the authenticated endpoint with your `appkey` for production workflows.
-
-## Related GuGuData APIs
+## Related APIs
 
 - [HTML/URL to PDF](https://gugudata.io/details/html2pdf)
 - [Image OCR Extraction](https://gugudata.io/details/imagestreamocr)
 - [PDF Parsing and Formatted Output](https://gugudata.io/details/pdf2format)
-
-For more developer APIs, visit [GuGuData](https://gugudata.io/).
