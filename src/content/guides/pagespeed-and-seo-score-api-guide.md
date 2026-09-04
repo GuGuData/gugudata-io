@@ -1,259 +1,185 @@
 ---
-title: PageSpeed and SEO Score API Integration Guide
+title: Real-Browser PageSpeed and SEO Audit API Guide
 description: >-
-  Learn how to integrate the PageSpeed and SEO Score API with documented request
-  parameters, response fields, error handling, and practical examples.
+  Run mobile or desktop laboratory audits for public webpages and receive page
+  quality scores, loading metrics, audit findings, and prioritized opportunities.
 slug: pagespeed-and-seo-score-api-guide
 date: '2026-07-08'
-updated: '2026-08-07'
+updated: '2026-09-04'
 category: SEO
-apiName: PageSpeed and SEO Score API
+apiName: Technical SEO Diagnostics API
 apiMethod: GET
 apiEndpoint: 'https://api.gugudata.io/v1/websitetools/pagespeed-score'
-detailUrl: 'https://gugudata.io/details/pagespeed-score'
-demoUrl: 'https://gugudata.io/demo/pagespeed-score'
+detailUrl: 'https://gugudata.io/details/pagespeed-score/'
+demoUrl: 'https://gugudata.io/demo/pagespeed-score/'
 cover_image: 'https://cdn.gugudata.io/api-covers/api-covers_pagespeed_score_v2.jpg'
-canonical_url: 'https://gugudata.io/details/pagespeed-score'
+canonical_url: 'https://gugudata.github.io/gugudata-io/guides/pagespeed-and-seo-score-api-guide/'
 tags:
   - seo
-  - webdev
-  - api
+  - web-performance
+  - accessibility
   - automation
 keywords:
   - PageSpeed API
-  - SEO score API
+  - browser audit API
   - technical SEO audit API
-  - website quality API
-  - performance audit API
+  - website performance API
+  - accessibility audit API
 featured: false
 ---
 
-# PageSpeed and SEO Score API Integration Guide
+# Real-Browser PageSpeed and SEO Audit API Guide
 
-Technical SEO teams need repeatable scoring, not one-off screenshots from manual tools. A page can rank poorly because of content gaps, but it can also lose opportunities because of slow response time, oversized assets, missing HTML signals, weak accessibility, or basic best-practice issues.
+The [Technical SEO Diagnostics API](https://gugudata.io/details/pagespeed-score/) loads a public webpage in a browser-based laboratory environment and returns requested performance, accessibility, best-practice, and SEO scores. It also provides loading measurements, individual audit results, and prioritized opportunities that teams can add to release checks, monitoring dashboards, and technical SEO workflows.
 
-The [GuGuData PageSpeed and SEO Score API](https://gugudata.io/details/pagespeed-score) scores a public webpage for performance, SEO, accessibility, and best-practice signals. It returns core metrics, category scores, audit results, and improvement opportunities so teams can build automated technical SEO checks into dashboards, monitoring systems, and content workflows.
-
-This guide covers the API, request parameters, response shape, and practical SEO workflows.
-
-
-> Start here: [Try the live demo](https://gugudata.io/demo/pagespeed-score) or [view the current API details](https://gugudata.io/details/pagespeed-score).
-
-## Why a PageSpeed and SEO score API matters
-
-Manual page checks are useful during debugging, but they do not scale across hundreds or thousands of URLs. SEO and web teams often need a repeatable API-driven workflow for:
-
-- Monitoring important landing pages.
-- Checking newly published content before promotion.
-- Comparing mobile and desktop page quality.
-- Creating technical SEO dashboards.
-- Auditing page templates across many URLs.
-- Triggering engineering tickets when scores drop.
-- Pairing page quality with search visibility trends.
-
-The API is especially useful when it is combined with search, traffic, and conversion data. A page with high impressions and poor technical quality is a better optimization target than a page with low demand and no traffic path.
+> [Try the live demo](https://gugudata.io/demo/pagespeed-score/) or [review the product details](https://gugudata.io/details/pagespeed-score/).
 
 ## API overview
 
 | Item | Value |
 | --- | --- |
-| API name | PageSpeed and SEO Score API |
 | Method | `GET` |
 | Endpoint | `https://api.gugudata.io/v1/websitetools/pagespeed-score` |
-| Detail page | [https://gugudata.io/details/pagespeed-score](https://gugudata.io/details/pagespeed-score) |
-| Demo page | [https://gugudata.io/demo/pagespeed-score](https://gugudata.io/demo/pagespeed-score) |
-| Main use case | Score a webpage for performance, SEO, accessibility, and best practices |
+| Device profiles | `desktop`, `mobile` |
+| Score categories | Performance, accessibility, best practices, SEO |
+| Result cache | 15 minutes unless `forceRefresh=true` |
 
 ## Request parameters
 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `appkey` | `string` | Yes | `YOUR_APPKEY` | Your GuGuData application key. |
-| `url` | `string` | Yes | None | Public HTTP or HTTPS URL to score. |
-| `strategy` | `string` | No | `desktop` | Scoring strategy. Use `desktop` or `mobile`. |
-| `locale` | `string` | No | `en` | Language preference for the result. |
-| `categories` | `string` | No | `performance,accessibility,best-practices,seo` | Comma-separated score categories. |
-| `forceRefresh` | `boolean` | No | `false` | Reserved for clients that want to bypass cache when caching is enabled. |
+| `appkey` | `string` | Yes | None | GuGuData application key. |
+| `url` | `string` | Yes | None | Complete public HTTP or HTTPS URL, up to 2,048 characters. |
+| `strategy` | `string` | No | `desktop` | Browser profile: `desktop` or `mobile`. |
+| `locale` | `string` | No | `en` | Locale used for audit labels. |
+| `categories` | `string` | No | All four | Comma-separated subset of `performance`, `accessibility`, `best-practices`, and `seo`. |
+| `forceRefresh` | `boolean` | No | `false` | Replace a recent cached result with a fresh audit. |
 
-Example request:
+Always URL-encode the complete value of `url`:
 
 ```bash
-curl "https://api.gugudata.io/v1/websitetools/pagespeed-score?appkey=YOUR_APPKEY&url=https%3A%2F%2Fwww.gugudata.io%2Fdetails%2Fsearch-visibility%2F&strategy=desktop&locale=en&categories=performance,accessibility,best-practices,seo"
+curl -G "https://api.gugudata.io/v1/websitetools/pagespeed-score" \
+  --data-urlencode "appkey=YOUR_APPKEY" \
+  --data-urlencode "url=https://gugudata.github.io/gugudata-io/guides/pagespeed-and-seo-score-api-guide/" \
+  --data-urlencode "strategy=mobile" \
+  --data-urlencode "locale=en" \
+  --data-urlencode "categories=performance,accessibility,best-practices,seo"
 ```
 
-## Response fields
+## Response structure
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `url` | `string` | Scored URL. |
-| `strategy` | `string` | `desktop` or `mobile`. |
-| `checkedAt` | `string` | Scoring timestamp. |
-| `coreMetrics` | `object` | Status, response time, content size, compression, image count, and script count. |
-| `scores` | `object` | Requested score categories from 0 to 100. |
-| `audits` | `array<object>` | Audit checks and pass or fail values. |
-| `opportunities` | `array<object>` | Recommended improvements for failed audits. |
-
-Example response shape:
+The endpoint keeps the same top-level data fields for compatibility. `url` is the final audited URL after redirects. Scores are integers from 0 to 100, and only requested categories appear in `scores`.
 
 ```json
 {
   "dataStatus": {
+    "requestParameter": "url=https://gugudata.github.io/gugudata-io/guides/pagespeed-and-seo-score-api-guide/&strategy=mobile&locale=en&categories=performance,accessibility,best-practices,seo&forceRefresh=false",
     "statusCode": 200,
     "status": "SUCCESS",
     "statusDescription": "successfully",
+    "responseDateTime": "2026-09-04 09:00:00.000",
     "dataTotalCount": 1
   },
   "data": {
-    "url": "https://www.gugudata.io/details/search-visibility/",
-    "strategy": "desktop",
-    "checkedAt": "2026-07-08T00:00:00Z",
+    "url": "https://gugudata.github.io/gugudata-io/guides/pagespeed-and-seo-score-api-guide/",
+    "strategy": "mobile",
+    "locale": "en",
+    "checkedAt": "2026-09-04T01:00:00.000Z",
     "coreMetrics": {
-      "status": 200,
-      "responseTimeMs": 420,
-      "contentSizeBytes": 128000,
-      "isCompressed": true,
-      "imageCount": 12,
-      "scriptCount": 8
+      "statusCode": 200,
+      "fetchTimeMs": 180,
+      "contentBytes": 48216,
+      "contentType": "text/html",
+      "compressed": true,
+      "imageCount": 2,
+      "missingImageAlt": 0,
+      "scriptCount": 4,
+      "url": "https://gugudata.github.io/gugudata-io/guides/pagespeed-and-seo-score-api-guide/",
+      "firstContentfulPaintMs": 940,
+      "largestContentfulPaintMs": 1210,
+      "totalBlockingTimeMs": 15,
+      "cumulativeLayoutShift": 0.01,
+      "speedIndexMs": 1080,
+      "interactiveMs": 1280
     },
     "scores": {
-      "performance": 86,
-      "accessibility": 92,
-      "bestPractices": 88,
-      "seo": 94
+      "performance": 96,
+      "accessibility": 100,
+      "bestPractices": 96,
+      "seo": 100
     },
     "audits": [
       {
-        "id": "meta-description",
-        "title": "Meta description",
-        "passed": true
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "passed": true,
+        "value": "0.9 s"
       }
     ],
-    "opportunities": [
-      {
-        "id": "image-optimization",
-        "title": "Optimize large images",
-        "impact": "medium"
-      }
-    ]
+    "opportunities": []
   }
 }
 ```
 
-## SEO workflows you can build
+The numbers above illustrate field shapes only. Browser laboratory results can vary with page content, network conditions, and third-party resources, so automated checks should use ranges and trends instead of exact score equality.
 
-### 1. Landing page quality monitoring
+## Loading measurements
 
-Build a list of important landing pages, call the API daily or weekly, and store the returned scores. A score trend is more useful than a single score because it shows whether a page template or deployment changed over time.
-
-Store:
-
-- URL
-- Strategy
-- Checked time
-- Performance score
-- SEO score
-- Accessibility score
-- Best-practices score
-- Core metrics
-- Failed audits
-- Opportunities
-
-Then create alerts when high-value URLs drop below your thresholds.
-
-### 2. Search visibility plus page quality
-
-Page quality matters most when there is real search opportunity. Pair PageSpeed and SEO Score API with [Search Visibility API](https://gugudata.io/details/search-visibility) to prioritize work.
-
-A practical prioritization model:
-
-| Signal | Meaning |
+| Field | Meaning |
 | --- | --- |
-| High search impressions, low CTR | Improve title, description, and SERP fit. |
-| High impressions, low page quality score | Review technical and user-experience issues. |
-| Strong page quality, low visibility | Improve content targeting and internal links. |
-| Low quality and low visibility | Deprioritize until search demand is proven. |
+| `firstContentfulPaintMs` | Time until the first page content is painted. |
+| `largestContentfulPaintMs` | Time until the largest measured content element is painted. |
+| `totalBlockingTimeMs` | Time that long main-thread tasks block interaction. |
+| `cumulativeLayoutShift` | Laboratory layout stability measurement. |
+| `speedIndexMs` | How quickly visible content appears during the load. |
+| `interactiveMs` | Laboratory estimate for page interactivity. |
 
-This prevents teams from spending a week optimizing a page that has no search demand.
+These are laboratory measurements, not real-user field data. They do not include a real-user Interaction to Next Paint measurement and do not guarantee search ranking changes.
 
-### 3. Template-level technical SEO audits
+## Practical workflows
 
-Many sites have repeated templates: product pages, API documentation pages, category pages, blog posts, and pricing pages. Instead of checking every URL manually, sample representative URLs from each template.
+### Release regression checks
 
-For each template:
+Audit a stable set of representative URLs before and after a deployment. Store the URL, strategy, requested categories, checked time, scores, metrics, and failed audits. Compare like-for-like profiles and investigate meaningful changes instead of failing a build on a one-point score fluctuation.
 
-- Score one desktop URL.
-- Score one mobile URL.
-- Compare audit failures.
-- Group opportunities by template.
-- Send engineering work to the owning team.
+### Mobile and desktop monitoring
 
-This is usually more effective than opening separate tickets for individual pages.
+Run separate mobile and desktop checks when templates or resource loading differ by device. Never combine the two strategies in one time series without preserving the `strategy` field.
 
-### 4. Pre-publish checks
+### Prioritized technical SEO work
 
-Before publishing a new SEO landing page, run the API on the staging or public preview URL if it is accessible. The response can catch missing title, missing meta description, oversized content, script bloat, or basic accessibility issues before the page enters the search index.
+Join audit findings with search impressions, conversions, or page importance. High-value pages with repeated failed audits should usually be reviewed before low-traffic pages with the same issue.
 
-For production workflows, run the score again after publication and store it with the page release record.
+### Fresh checks after deployment
 
-## Desktop vs mobile strategy
-
-Use `desktop` when your users primarily browse on larger screens or when you need a stable comparison for business tools and documentation pages.
-
-Use `mobile` when:
-
-- The page targets consumer search traffic.
-- Mobile SERP traffic is important.
-- Your templates behave differently on small screens.
-- Layout, loading, or image behavior changes significantly by device.
-
-Many SEO teams store both. The important part is to avoid mixing scores without recording the strategy.
-
-## Implementation notes
-
-- Always URL-encode the `url` query parameter.
-- Store `strategy` with every result.
-- Keep `forceRefresh` false unless your workflow explicitly needs a fresh run.
-- Record failed audits and opportunities, not only top-level scores.
-- Use thresholds by page type. A documentation page and a media-heavy article may need different score targets.
-- Keep `appkey` on your backend.
-- Avoid scoring very large URL lists without a queue and rate-limit policy.
+Routine dashboards should reuse the default cache. Use `forceRefresh=true` after a deployment or an important page change when a new browser run is required immediately.
 
 ## HTTP status handling
 
-| HTTP status | Meaning | Recommended handling |
+| HTTP status | Meaning | Recommended action |
 | --- | --- | --- |
-| `200` | Page scored successfully. | Store scores, audits, and opportunities. |
-| `400` | Missing, invalid, or unreachable URL. | Validate URL and retry only after correction. |
-| `401` | Missing or unknown application key. | Check your `appkey`. |
-| `403` | Access or payment issue. | Check subscription and endpoint access. |
-| `429` | Rate limit reached. | Reduce concurrency or retry later. |
-| `503` | Scoring service unavailable. | Retry later and keep the URL in the queue. |
+| `200` | Browser audit completed. | Store the normalized result. |
+| `400` | URL or request option is invalid. | Correct the request before retrying. |
+| `401` | Application key is missing or unknown. | Check `appkey`. |
+| `403` | The key cannot access this product. | Check authorization or subscription. |
+| `422` | The target could not produce a usable audit. | Confirm that it serves an auditable HTML page. |
+| `429` | API rate limit reached. | Reduce request concurrency. |
+| `502` | The target failed during loading or auditing. | Check the target and retry later if the failure is temporary. |
+| `503` | Audit capacity or service is temporarily unavailable. | Retry with bounded backoff. |
 
-## FAQ
+## Integration guidance
 
-### Is this only a performance API?
+- Keep `appkey` on your server rather than in browser code.
+- Queue large URL sets and respect rate limits.
+- Persist the final returned `url`, because redirects may change the audited page.
+- Treat nullable loading measurements as unavailable evidence, not as zero.
+- Save audit IDs and opportunities so teams can see why a score changed.
+- Use manual review for high-impact decisions; automated scores are diagnostic evidence rather than business outcomes.
 
-No. The API returns performance, SEO, accessibility, and best-practice signals. The exact categories can be controlled through the `categories` parameter.
+## Related APIs
 
-### Should I check every page on my site every day?
-
-Usually no. Start with high-value URLs and representative templates. Expand coverage after you know how the results will be used.
-
-### Can this replace manual SEO audits?
-
-It replaces repetitive checks, not expert judgment. Use it to identify changes, regressions, and opportunities at scale, then review important pages manually when needed.
-
-### How should I connect this with business metrics?
-
-Join the score result to URL-level search impressions, clicks, CTR, orders, demo runs, or lead events. That tells you which technical fixes are most likely to matter.
-
-## Related GuGuData APIs
-
-- [Search Visibility API](https://gugudata.io/details/search-visibility): monitor visibility signals and connect SEO demand with technical page quality.
-- [Article Content Extraction API](https://gugudata.io/details/fetchcontent): extract readable content from article pages.
-- [Extract Images from Article URL API](https://gugudata.io/details/fetchcontentimages): inspect article image candidates and alt text.
-- [Domain DNS Information Query](https://gugudata.io/details/dnslookup): check domain DNS records.
-- [Domain SSL Certificate Information Parsing](https://gugudata.io/details/sslcertinfo): verify certificate details for technical audits.
-- [Webpage Screenshot Capture](https://gugudata.io/details/url2snapshot): capture visual evidence for audits and reports.
-
-For more website and SEO APIs, visit [GuGuData](https://gugudata.io/).
+- [Keyword Rank Visibility API](https://gugudata.io/details/search-visibility/) connects page quality with search visibility.
+- [Article Content Extraction API](https://gugudata.io/details/fetchcontent/) extracts readable page content.
+- [DNS Lookup API](https://gugudata.io/details/dnslookup/) checks domain records.
+- [SSL Certificate Information API](https://gugudata.io/details/sslcertinfo/) inspects certificate details.
+- [Webpage Screenshot Capture API](https://gugudata.io/details/url2snapshot/) captures visual evidence for review.
