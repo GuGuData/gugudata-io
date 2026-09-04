@@ -90,7 +90,7 @@ Set `storage=private` when generated documents should not have public URLs. The 
 {
   "data": {
     "uuid": "8c90a913-7012-447e-a088-041f9652e924",
-    "num_files": 1,
+    "num_files": 2,
     "pdf_files": [],
     "storage": "private",
     "files": [
