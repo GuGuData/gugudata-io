@@ -50,7 +50,7 @@ Candidates are ordered by descending probability. `LanguageAbbr` uses a lowercas
 ```json
 {
   "dataStatus": {
-    "requestParameter": "content_chars=72,content_bytes=78",
+    "requestParameter": "content_chars=72,content_bytes=73",
     "statusCode": 200,
     "status": "SUCCESS",
     "statusDescription": "successfully",
